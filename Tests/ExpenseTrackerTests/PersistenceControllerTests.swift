@@ -16,6 +16,7 @@ final class PersistenceControllerTests: XCTestCase {
         expense.category = "Food"
         expense.tags = ["meal", "lunch"]
         expense.notes = "Paid by cash"
+        expense.frequency = .weekly
 
         try context.save()
 
@@ -27,6 +28,7 @@ final class PersistenceControllerTests: XCTestCase {
             XCTAssertEqual(first.category, "Food")
             XCTAssertEqual(first.tags ?? [], ["meal", "lunch"])
             XCTAssertEqual(first.notes, "Paid by cash")
+            XCTAssertEqual(first.frequency, .weekly)
         }
 
         if let fetchedExpense = results.first {
