@@ -30,7 +30,7 @@ final class ExpenseTrackerTests: XCTestCase {
         let rotated = UIImage(cgImage: baseImage.cgImage!, scale: 1, orientation: .right)
 
         let expectation = expectation(description: "scan")
-        ReceiptScanner().scan(image: rotated) { result in
+        ReceiptScanner().scan(image: rotated, preprocess: true) { result in
             switch result {
             case .success(let strings):
                 XCTAssertTrue(strings.contains(where: { $0.contains(text) }))
