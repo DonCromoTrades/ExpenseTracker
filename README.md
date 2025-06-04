@@ -10,9 +10,16 @@ ExpenseTracker is an app designed to help you scan receipts, organize expenses, 
 
 ## Building the Project
 
-1. Open `ExpenseTracker.xcodeproj` in Xcode 14 or later.
-2. Ensure you have the iOS 15 SDK or later installed.
-3. Select an iOS simulator (or a connected device) and press **Run**.
+This repository contains both a Swift Package and an Xcode project. If you only
+need the command-line build of the package, run:
+
+```bash
+swift build
+```
+
+For the iOS application, open `ExpenseTracker.xcodeproj` in Xcode 14 or later,
+ensure you have the iOS 15 SDK installed, select a simulator (or a connected
+device) and press **Run**.
 
 ## Running on a Device
 
