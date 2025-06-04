@@ -5,13 +5,21 @@ import PackageDescription
 
 let package = Package(
     name: "ExpenseTracker",
+    platforms: [
+        .iOS(.v15)
+    ],
+    products: [
+        .library(name: "ReceiptScanner", targets: ["ReceiptScanner"]),
+        .library(name: "ExpenseStore", targets: ["ExpenseStore"]),
+        .library(name: "DataVisualizer", targets: ["DataVisualizer"])
+    ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // The main executable target for the application.
+        .target(name: "ReceiptScanner"),
+        .target(name: "ExpenseStore"),
+        .target(name: "DataVisualizer", dependencies: ["ExpenseStore"]),
         .executableTarget(
-            name: "ExpenseTracker"),
-
-        // Test suite target using XCTest
+            name: "ExpenseTracker",
+            dependencies: ["ReceiptScanner", "ExpenseStore", "DataVisualizer"]),
         .testTarget(
             name: "ExpenseTrackerTests",
             dependencies: ["ExpenseTracker"]),
