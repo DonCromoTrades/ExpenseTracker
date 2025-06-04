@@ -2,7 +2,7 @@
 
 ExpenseTracker is an app designed to help you scan receipts, organize expenses, and visualize spending over time. The code base is structured into several Swift modules to keep functionality isolated:
 
-- **ReceiptScanner** – a Vision-based utility for extracting text from receipt images.
+- **ReceiptScanner** – a Vision-based utility for extracting text from receipt images. The library offers a platform-agnostic `scan(data:completion:)` API, while iOS also provides a `scan(image:)` wrapper.
 - **ExpenseStore** – a Core Data stack with an `Expense` model for persisting transactions.
 - **DataVisualizer** – minimal SwiftUI views to render charts from stored data.
 

@@ -28,5 +28,32 @@ final class ReceiptScannerTests: XCTestCase {
         }
         wait(for: [expectation], timeout: 5)
     }
+
+    func testScanFromData() {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 200, height: 50))
+        let image = renderer.image { ctx in
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 20)
+            ]
+            let text = NSString(string: "Total $5")
+            text.draw(at: CGPoint(x: 10, y: 10), withAttributes: attributes)
+        }
+        guard let data = image.jpegData(compressionQuality: 1.0) else {
+            XCTFail("Failed to get JPEG data")
+            return
+        }
+        let expectation = expectation(description: "scanningData")
+        ReceiptScanner().scan(data: data) { result in
+            switch result {
+            case .success(let data):
+                XCTAssertTrue(data.lines.contains { $0.contains("Total") })
+                XCTAssertEqual(data.total, 5)
+            case .failure(let error):
+                XCTFail("Scan failed with error: \(error)")
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 5)
+    }
 }
 #endif
