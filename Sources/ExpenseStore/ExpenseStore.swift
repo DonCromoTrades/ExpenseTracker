@@ -225,6 +225,26 @@ public struct PersistenceController {
         ctx.delete(budget)
         try ctx.save()
     }
+
+    @discardableResult
+    public func addExpense(title: String, amount: Double, date: Date,
+                           category: String? = nil, notes: String? = nil) throws -> Expense {
+        let expense = Expense(context: container.viewContext)
+        expense.id = UUID()
+        expense.title = title
+        expense.amount = amount
+        expense.date = date
+        expense.category = category
+        expense.notes = notes
+        try container.viewContext.save()
+        return expense
+    }
+
+    public func deleteExpense(_ expense: Expense) throws {
+        let ctx = container.viewContext
+        ctx.delete(expense)
+        try ctx.save()
+    }
 }
 #else
 import Foundation
