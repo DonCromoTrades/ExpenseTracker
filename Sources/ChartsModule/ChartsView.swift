@@ -1,3 +1,4 @@
+#if canImport(SwiftUI) && canImport(Charts)
 import SwiftUI
 import Charts
 
@@ -17,3 +18,11 @@ public struct MonthlySummaryChart: View {
         }
     }
 }
+#else
+public struct MonthlySummaryChart {
+    public var data: [Double]
+    public init(data: [Double]) {
+        self.data = data
+    }
+}
+#endif

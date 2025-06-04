@@ -1,7 +1,8 @@
-import SwiftUI
 import ReceiptCapture
 import DataModel
 import ChartsModule
+#if canImport(SwiftUI)
+import SwiftUI
 
 @main
 struct ExpenseTrackerApp: App {
@@ -17,3 +18,11 @@ struct ContentView: View {
         Text("Expense Tracker")
     }
 }
+#else
+@main
+struct ExpenseTrackerApp {
+    static func main() {
+        print("ExpenseTrackerApp requires SwiftUI")
+    }
+}
+#endif

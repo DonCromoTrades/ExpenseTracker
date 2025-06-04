@@ -1,6 +1,10 @@
 import Foundation
+#if canImport(CoreData)
 import CoreData
+#endif
 
+#if canImport(CoreData)
+@MainActor
 public class DataController {
     public static let shared = DataController()
     public let container: NSPersistentContainer
@@ -21,3 +25,13 @@ public class DataController {
         }
     }
 }
+#else
+@MainActor
+/// Stub controller used on platforms without CoreData (e.g., Linux). This allows
+/// the package to build even when the CoreData framework is unavailable.
+public class DataController {
+    public static let shared = DataController()
+    private init() {}
+    public func saveContext() {}
+}
+#endif
