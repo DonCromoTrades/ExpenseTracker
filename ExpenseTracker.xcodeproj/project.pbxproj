@@ -1,0 +1,173 @@
+
+{
+archiveVersion = 1;
+classes = {};
+objectVersion = 55;
+objects = {
+
+/* Begin PBXBuildFile section */
+55A9FE13112C47C5A7C0B898 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41EE96A61EBA435EABA9FD22 /* ContentView.swift */; };
+B940E90034164C8C8497C764 /* ExpenseTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603F907A166C46C793CC5B29 /* ExpenseTrackerApp.swift */; };
+84FBB02351E841C1BDCB9B02 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C7E9A47854348CBB1A736EE /* Assets.xcassets */; };
+6CD8E1E497F84BA2A223D0A5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D6B1A496FB05418EBBE772BA /* Preview Assets.xcassets */; };
+CCD7AE57A3D848D889486701 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1CF064E237A147CF8106ADD3 /* LaunchScreen.storyboard */; };
+0FF9F6C322B54F3AA6208E01 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6FD7CCDEFD4482DB19F0097 /* Info.plist */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+41EE96A61EBA435EABA9FD22 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+603F907A166C46C793CC5B29 /* ExpenseTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseTrackerApp.swift; sourceTree = "<group>"; };
+0C7E9A47854348CBB1A736EE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+D6B1A496FB05418EBBE772BA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+1CF064E237A147CF8106ADD3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+F6FD7CCDEFD4482DB19F0097 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+DC40331DFF9141B4A9055962 /* ExpenseTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = ExpenseTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+5DE6A18C52934FE9BC533623 = {
+isa = PBXGroup;
+children = (
+E97EFAB98E944B708B03C8A9,
+1DA16C630E6041678DBE5272,
+);
+sourceTree = "<group>";
+};
+
+E97EFAB98E944B708B03C8A9 = {
+isa = PBXGroup;
+path = ExpenseTracker;
+children = (
+41EE96A61EBA435EABA9FD22,
+603F907A166C46C793CC5B29,
+0C7E9A47854348CBB1A736EE,
+D6B1A496FB05418EBBE772BA,
+1CF064E237A147CF8106ADD3,
+F6FD7CCDEFD4482DB19F0097,
+);
+sourceTree = "<group>";
+};
+
+1DA16C630E6041678DBE5272 = {
+isa = PBXGroup;
+children = (
+DC40331DFF9141B4A9055962,
+);
+name = Products;
+sourceTree = "<group>";
+};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+2EC3532DA6CE4CD6A05A8F1D = {
+isa = PBXNativeTarget;
+buildConfigurationList = 61E735DCD55649308DC3FD13;
+buildPhases = (
+3458DE81A2064176AC4F50F8,
+9FED7B18C5E941109278A008,
+);
+buildRules = (
+);
+dependencies = (
+);
+name = ExpenseTracker;
+productName = ExpenseTracker;
+productReference = DC40331DFF9141B4A9055962;
+productType = "com.apple.product-type.application";
+};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+CC8AFC42AF2A409496F7B8A3 = {
+isa = PBXProject;
+buildConfigurationList = DDBBA27B24774493BF2F05AC;
+compatibilityVersion = "Xcode 14.0";
+developmentRegion = en;
+hasScannedForEncodings = 0;
+knownRegions = (
+en,
+);
+mainGroup = 5DE6A18C52934FE9BC533623;
+productRefGroup = 1DA16C630E6041678DBE5272;
+projectDirPath = "";
+projectRoot = "";
+targets = (
+2EC3532DA6CE4CD6A05A8F1D,
+);
+};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+3458DE81A2064176AC4F50F8 = {
+isa = PBXSourcesBuildPhase;
+buildActionMask = 2147483647;
+files = (
+55A9FE13112C47C5A7C0B898,
+B940E90034164C8C8497C764,
+);
+runOnlyForDeploymentPostprocessing = 0;
+};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+9FED7B18C5E941109278A008 = {
+isa = PBXResourcesBuildPhase;
+buildActionMask = 2147483647;
+files = (
+84FBB02351E841C1BDCB9B02,
+6CD8E1E497F84BA2A223D0A5,
+CCD7AE57A3D848D889486701,
+0FF9F6C322B54F3AA6208E01,
+);
+runOnlyForDeploymentPostprocessing = 0;
+};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+4D8ACCD0D08E463DB930CCEA = {
+isa = XCBuildConfiguration;
+buildSettings = {
+INFOPLIST_FILE = ExpenseTracker/Info.plist;
+PRODUCT_BUNDLE_IDENTIFIER = com.example.ExpenseTracker;
+PRODUCT_NAME = "$(TARGET_NAME)";
+SWIFT_VERSION = 5.0;
+TARGETED_DEVICE_FAMILY = "1,2";
+};
+name = Debug;
+};
+2CB35F1296D04186B52227B3 = {
+isa = XCBuildConfiguration;
+buildSettings = {
+INFOPLIST_FILE = ExpenseTracker/Info.plist;
+PRODUCT_BUNDLE_IDENTIFIER = com.example.ExpenseTracker;
+PRODUCT_NAME = "$(TARGET_NAME)";
+SWIFT_VERSION = 5.0;
+TARGETED_DEVICE_FAMILY = "1,2";
+};
+name = Release;
+};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+61E735DCD55649308DC3FD13 = {
+isa = XCConfigurationList;
+buildConfigurations = (
+4D8ACCD0D08E463DB930CCEA,
+2CB35F1296D04186B52227B3,
+);
+defaultConfigurationIsVisible = 0;
+defaultConfigurationName = Release;
+};
+DDBBA27B24774493BF2F05AC = {
+isa = XCConfigurationList;
+buildConfigurations = (
+4D8ACCD0D08E463DB930CCEA,
+2CB35F1296D04186B52227B3,
+);
+defaultConfigurationIsVisible = 0;
+defaultConfigurationName = Release;
+};
+/* End XCConfigurationList section */
+};
+rootObject = CC8AFC42AF2A409496F7B8A3;
+}
