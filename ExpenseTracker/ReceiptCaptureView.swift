@@ -1,12 +1,25 @@
 import SwiftUI
 import ReceiptScanner
+import ExpenseStore
 
 struct ReceiptCaptureView: View {
+    @Environment(\.managedObjectContext) private var context
+    @Environment(\.dismiss) private var dismiss
+    private let persistence: PersistenceController
+
     @State private var showPicker = false
     @State private var image: UIImage?
     @State private var recognizedLines: [String] = []
     @State private var isScanning = false
     @State private var pickerSource: UIImagePickerController.SourceType = .camera
+    @State private var title: String = ""
+    @State private var amount: String = ""
+    @State private var date = Date()
+    @State private var category: String = ""
+
+    init(persistence: PersistenceController = .shared) {
+        self.persistence = persistence
+    }
 
     var body: some View {
         VStack {
@@ -19,12 +32,24 @@ struct ReceiptCaptureView: View {
             if isScanning {
                 ProgressView()
             }
-            List {
-                ForEach(recognizedLines.indices, id: \.self) { index in
-                    TextField("Line", text: Binding(
-                        get: { recognizedLines[index] },
-                        set: { recognizedLines[index] = $0 }
-                    ))
+            Form {
+                if !recognizedLines.isEmpty {
+                    Section(header: Text("Lines")) {
+                        ForEach(recognizedLines.indices, id: \.self) { index in
+                            TextField("Line", text: Binding(
+                                get: { recognizedLines[index] },
+                                set: { recognizedLines[index] = $0 }
+                            ))
+                        }
+                    }
+                    Section(header: Text("Details")) {
+                        TextField("Title", text: $title)
+                        TextField("Amount", text: $amount)
+                            .keyboardType(.decimalPad)
+                        DatePicker("Date", selection: $date, displayedComponents: .date)
+                        TextField("Category", text: $category)
+                        Button("Save") { save() }
+                    }
                 }
             }
         }
@@ -59,11 +84,24 @@ struct ReceiptCaptureView: View {
                 switch result {
                 case .success(let data):
                     self.recognizedLines = data.lines
+                    self.title = data.vendor ?? ""
+                    if let total = data.total { self.amount = String(total) }
+                    self.date = data.date ?? Date()
                 case .failure:
                     self.recognizedLines = []
                 }
                 self.isScanning = false
             }
+        }
+    }
+
+    private func save() {
+        guard let amt = Double(amount) else { return }
+        do {
+            _ = try persistence.addExpense(title: title, amount: amt, date: date, category: category.isEmpty ? nil : category)
+            dismiss()
+        } catch {
+            print("Save error: \(error)")
         }
     }
 }
@@ -101,5 +139,8 @@ private struct ImagePicker: UIViewControllerRepresentable {
 }
 
 #Preview {
-    NavigationView { ReceiptCaptureView() }
+    let controller = PersistenceController(inMemory: true)
+    let ctx = controller.container.viewContext
+    return NavigationView { ReceiptCaptureView(persistence: controller) }
+        .environment(\.managedObjectContext, ctx)
 }

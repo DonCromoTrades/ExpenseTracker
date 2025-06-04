@@ -18,5 +18,12 @@ final class BudgetRecurringViewTests: XCTestCase {
         let view = RecurringExpenseListView(persistence: controller).environment(\.managedObjectContext, ctx)
         XCTAssertNotNil(view)
     }
+
+    func testReceiptCaptureViewInit() {
+        let controller = PersistenceController(inMemory: true)
+        let ctx = controller.container.viewContext
+        let view = ReceiptCaptureView(persistence: controller).environment(\.managedObjectContext, ctx)
+        XCTAssertNotNil(view)
+    }
 }
 #endif
