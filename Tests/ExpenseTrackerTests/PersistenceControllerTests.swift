@@ -39,5 +39,31 @@ final class PersistenceControllerTests: XCTestCase {
         results = try context.fetch(request)
         XCTAssertEqual(results.count, 0)
     }
+
+    func testRecurringAndBudgetHelpers() throws {
+        let controller = PersistenceController(inMemory: true)
+        let ctx = controller.container.viewContext
+
+        // Recurring Expense
+        let recurring = try controller.addRecurringExpense(title: "Gym", amount: 50, startDate: Date(), frequency: "Weekly")
+
+        var reFetch: [RecurringExpense] = try ctx.fetch(RecurringExpense.fetchRequest())
+        XCTAssertEqual(reFetch.count, 1)
+        XCTAssertEqual(reFetch.first?.title, "Gym")
+
+        try controller.deleteRecurringExpense(recurring)
+        reFetch = try ctx.fetch(RecurringExpense.fetchRequest())
+        XCTAssertEqual(reFetch.count, 0)
+
+        // Budget
+        let budget = try controller.addBudget(category: "Food", limit: 200)
+        var bFetch: [Budget] = try ctx.fetch(Budget.fetchRequest())
+        XCTAssertEqual(bFetch.count, 1)
+        XCTAssertEqual(bFetch.first?.category, "Food")
+
+        try controller.deleteBudget(budget)
+        bFetch = try ctx.fetch(Budget.fetchRequest())
+        XCTAssertEqual(bFetch.count, 0)
+    }
 }
 #endif

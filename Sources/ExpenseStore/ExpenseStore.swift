@@ -19,6 +19,32 @@ extension Expense {
     }
 }
 
+public class RecurringExpense: NSManagedObject {
+    @NSManaged public var id: UUID
+    @NSManaged public var title: String
+    @NSManaged public var amount: Double
+    @NSManaged public var startDate: Date
+    @NSManaged public var frequency: String
+}
+
+extension RecurringExpense {
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<RecurringExpense> {
+        NSFetchRequest<RecurringExpense>(entityName: "RecurringExpense")
+    }
+}
+
+public class Budget: NSManagedObject {
+    @NSManaged public var id: UUID
+    @NSManaged public var category: String
+    @NSManaged public var limit: Double
+}
+
+extension Budget {
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<Budget> {
+        NSFetchRequest<Budget>(entityName: "Budget")
+    }
+}
+
 extension Expense {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Expense> {
         NSFetchRequest<Expense>(entityName: "Expense")
@@ -97,8 +123,107 @@ public struct PersistenceController {
         properties.append(frequency)
 
         entity.properties = properties
-        model.entities = [entity]
+
+        // RecurringExpense entity
+        let recurring = NSEntityDescription()
+        recurring.name = "RecurringExpense"
+        recurring.managedObjectClassName = NSStringFromClass(RecurringExpense.self)
+
+        var recurringProps: [NSPropertyDescription] = []
+        let rid = NSAttributeDescription()
+        rid.name = "id"
+        rid.attributeType = .UUIDAttributeType
+        rid.isOptional = false
+        recurringProps.append(rid)
+
+        let rtitle = NSAttributeDescription()
+        rtitle.name = "title"
+        rtitle.attributeType = .stringAttributeType
+        rtitle.isOptional = false
+        recurringProps.append(rtitle)
+
+        let ramount = NSAttributeDescription()
+        ramount.name = "amount"
+        ramount.attributeType = .doubleAttributeType
+        ramount.isOptional = false
+        recurringProps.append(ramount)
+
+        let rstartDate = NSAttributeDescription()
+        rstartDate.name = "startDate"
+        rstartDate.attributeType = .dateAttributeType
+        rstartDate.isOptional = false
+        recurringProps.append(rstartDate)
+
+        let rfrequency = NSAttributeDescription()
+        rfrequency.name = "frequency"
+        rfrequency.attributeType = .stringAttributeType
+        rfrequency.isOptional = false
+        recurringProps.append(rfrequency)
+
+        recurring.properties = recurringProps
+
+        // Budget entity
+        let budgetEntity = NSEntityDescription()
+        budgetEntity.name = "Budget"
+        budgetEntity.managedObjectClassName = NSStringFromClass(Budget.self)
+
+        var budgetProps: [NSPropertyDescription] = []
+        let bid = NSAttributeDescription()
+        bid.name = "id"
+        bid.attributeType = .UUIDAttributeType
+        bid.isOptional = false
+        budgetProps.append(bid)
+
+        let bcat = NSAttributeDescription()
+        bcat.name = "category"
+        bcat.attributeType = .stringAttributeType
+        bcat.isOptional = false
+        budgetProps.append(bcat)
+
+        let blimit = NSAttributeDescription()
+        blimit.name = "limit"
+        blimit.attributeType = .doubleAttributeType
+        blimit.isOptional = false
+        budgetProps.append(blimit)
+
+        budgetEntity.properties = budgetProps
+
+        model.entities = [entity, recurring, budgetEntity]
         return model
+    }
+
+    @discardableResult
+    public func addRecurringExpense(title: String, amount: Double, startDate: Date, frequency: String) throws -> RecurringExpense {
+        let obj = RecurringExpense(context: container.viewContext)
+        obj.id = UUID()
+        obj.title = title
+        obj.amount = amount
+        obj.startDate = startDate
+        obj.frequency = frequency
+        try container.viewContext.save()
+        return obj
+    }
+
+    public func deleteRecurringExpense(_ expense: RecurringExpense) throws {
+        let ctx = container.viewContext
+        ctx.delete(expense)
+        try ctx.save()
+    }
+
+    @discardableResult
+    public func addBudget(category: String, limit: Double) throws -> Budget {
+        let budget = Budget(context: container.viewContext)
+        budget.id = UUID()
+        budget.category = category
+        budget.limit = limit
+        try container.viewContext.save()
+        return budget
+    }
+
+    public func deleteBudget(_ budget: Budget) throws {
+        let ctx = container.viewContext
+        ctx.delete(budget)
+        try ctx.save()
     }
 }
 #else
