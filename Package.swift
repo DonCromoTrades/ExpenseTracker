@@ -11,17 +11,19 @@ let package = Package(
     products: [
         .library(name: "ReceiptScanner", targets: ["ReceiptScanner"]),
         .library(name: "ExpenseStore", targets: ["ExpenseStore"]),
-        .library(name: "DataVisualizer", targets: ["DataVisualizer"])
+        .library(name: "DataVisualizer", targets: ["DataVisualizer"]),
+        .library(name: "UserAuth", targets: ["UserAuth"])
     ],
     targets: [
         .target(name: "ReceiptScanner"),
         .target(name: "ExpenseStore"),
         .target(name: "DataVisualizer", dependencies: ["ExpenseStore"]),
+        .target(name: "UserAuth"),
         .executableTarget(
             name: "ExpenseTracker",
-            dependencies: ["ReceiptScanner", "ExpenseStore", "DataVisualizer"]),
+            dependencies: ["ReceiptScanner", "ExpenseStore", "DataVisualizer", "UserAuth"]),
         .testTarget(
             name: "ExpenseTrackerTests",
-            dependencies: ["ExpenseTracker", "DataVisualizer", "ExpenseStore"]),
+            dependencies: ["ExpenseTracker", "DataVisualizer", "ExpenseStore", "UserAuth"]),
     ]
 )
