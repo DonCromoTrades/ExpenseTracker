@@ -24,6 +24,7 @@ public class RecurringExpense: NSManagedObject {
     @NSManaged public var title: String
     @NSManaged public var amount: Double
     @NSManaged public var startDate: Date
+    @NSManaged public var nextDate: Date
     @NSManaged public var frequency: String
 }
 
@@ -154,6 +155,12 @@ public struct PersistenceController {
         rstartDate.isOptional = false
         recurringProps.append(rstartDate)
 
+        let rnextDate = NSAttributeDescription()
+        rnextDate.name = "nextDate"
+        rnextDate.attributeType = .dateAttributeType
+        rnextDate.isOptional = false
+        recurringProps.append(rnextDate)
+
         let rfrequency = NSAttributeDescription()
         rfrequency.name = "frequency"
         rfrequency.attributeType = .stringAttributeType
@@ -199,6 +206,7 @@ public struct PersistenceController {
         obj.title = title
         obj.amount = amount
         obj.startDate = startDate
+        obj.nextDate = startDate
         obj.frequency = frequency
         try container.viewContext.save()
         return obj
