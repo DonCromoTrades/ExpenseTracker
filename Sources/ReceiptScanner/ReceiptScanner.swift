@@ -23,7 +23,8 @@ public class ReceiptScanner {
             completion(.success(texts))
         }
         request.recognitionLevel = .accurate
-        let handler = VNImageRequestHandler(cgImage: cgImage)
+        let orientation = CGImagePropertyOrientation(image.imageOrientation)
+        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: orientation)
         DispatchQueue.global().async {
             do {
                 try handler.perform([request])
@@ -35,6 +36,22 @@ public class ReceiptScanner {
 
     public enum ScannerError: Error {
         case invalidImage
+    }
+}
+
+extension CGImagePropertyOrientation {
+    init(_ orientation: UIImage.Orientation) {
+        switch orientation {
+        case .up: self = .up
+        case .down: self = .down
+        case .left: self = .left
+        case .right: self = .right
+        case .upMirrored: self = .upMirrored
+        case .downMirrored: self = .downMirrored
+        case .leftMirrored: self = .leftMirrored
+        case .rightMirrored: self = .rightMirrored
+        @unknown default: self = .up
+        }
     }
 }
 #else
