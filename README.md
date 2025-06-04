@@ -83,3 +83,9 @@ if let groceries = budgets.first(where: { $0.category == "Groceries" }) {
 
 This project is licensed under the [MIT License](LICENSE).
 
+
+## Disclaimers
+
+- The OCR process may occasionally misread text on receipts.
+- ExpenseTracker is a personal finance tool and does not constitute professional financial advice.
+- User data is stored locally on the device or synced privately with iCloud if enabled.
