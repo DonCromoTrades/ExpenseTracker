@@ -1,14 +1,22 @@
 #if canImport(SwiftUI) && canImport(CoreData)
 import SwiftUI
+import CoreData
 import ExpenseStore
 
 public struct ExpensesChartView: View {
-    @FetchRequest(
-        entity: Expense.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Expense.date, ascending: true)]
-    ) private var expenses: FetchedResults<Expense>
+    @FetchRequest private var expenses: FetchedResults<Expense>
+    private let context: NSManagedObjectContext
 
-    public init() {}
+    public init(context: NSManagedObjectContext) {
+        self.context = context
+        _expenses = FetchRequest(
+            entity: Expense.entity(),
+            sortDescriptors: [NSSortDescriptor(keyPath: \Expense.date, ascending: true)],
+            animation: .default,
+            predicate: nil,
+            managedObjectContext: context
+        )
+    }
 
     public var body: some View {
         VStack {
@@ -20,6 +28,6 @@ public struct ExpensesChartView: View {
 import Foundation
 
 public struct ExpensesChartView {
-    public init() {}
+    public init(context: Any? = nil) {}
 }
 #endif

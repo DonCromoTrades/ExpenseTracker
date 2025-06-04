@@ -22,6 +22,6 @@ let package = Package(
             dependencies: ["ReceiptScanner", "ExpenseStore", "DataVisualizer"]),
         .testTarget(
             name: "ExpenseTrackerTests",
-            dependencies: ["ExpenseTracker"]),
+            dependencies: ["ExpenseTracker", "DataVisualizer", "ExpenseStore"]),
     ]
 )
