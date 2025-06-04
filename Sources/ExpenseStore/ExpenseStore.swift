@@ -9,6 +9,14 @@ public class Expense: NSManagedObject {
     @NSManaged public var category: String?
     @NSManaged public var tags: [String]?
     @NSManaged public var notes: String?
+    @NSManaged @objc(frequency) private var frequencyRaw: String?
+}
+
+extension Expense {
+    public var frequency: RecurrenceFrequency? {
+        get { frequencyRaw.flatMap { RecurrenceFrequency(rawValue: $0) } }
+        set { frequencyRaw = newValue?.rawValue }
+    }
 }
 
 extension Expense {
@@ -81,6 +89,12 @@ public struct PersistenceController {
         notes.attributeType = .stringAttributeType
         notes.isOptional = true
         properties.append(notes)
+
+        let frequency = NSAttributeDescription()
+        frequency.name = "frequency"
+        frequency.attributeType = .stringAttributeType
+        frequency.isOptional = true
+        properties.append(frequency)
 
         entity.properties = properties
         model.entities = [entity]
