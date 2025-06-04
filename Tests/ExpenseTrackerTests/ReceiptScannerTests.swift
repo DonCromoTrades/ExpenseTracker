@@ -18,8 +18,9 @@ final class ReceiptScannerTests: XCTestCase {
         let scanner = ReceiptScanner()
         scanner.scan(image: image) { result in
             switch result {
-            case .success(let texts):
-                XCTAssertTrue(texts.contains { $0.contains("Total") })
+            case .success(let data):
+                XCTAssertTrue(data.lines.contains { $0.contains("Total") })
+                XCTAssertEqual(data.total, 5)
             case .failure(let error):
                 XCTFail("Scan failed with error: \(error)")
             }
