@@ -3,6 +3,8 @@ import PackageDescription
 
 let package = Package(
     name: "ExpenseTracker",
+    // Specify iOS 16 when building for iOS, but allow other platforms such as
+    // Linux where these frameworks are unavailable.
     platforms: [
         .iOS(.v16)
     ],
