@@ -44,4 +44,36 @@ final class ExpenseTrackerTests: XCTestCase {
         throw XCTSkip("Requires iOS")
 #endif
     }
+
+    func testCommandLineTool() throws {
+        #if os(iOS)
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 40))
+        let image = renderer.image { ctx in
+            NSString(string: "Total $5").draw(at: .zero, withAttributes: [.font: UIFont.systemFont(ofSize: 20)])
+        }
+        let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("cli_test.png")
+        try image.pngData()!.write(to: url)
+
+        let process = Process()
+        process.executableURL = productsDirectory.appendingPathComponent("ExpenseTracker")
+        process.arguments = [url.path]
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        try process.run()
+        process.waitUntilExit()
+        let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+        XCTAssertFalse(output.isEmpty)
+        #else
+        throw XCTSkip("Requires iOS")
+        #endif
+    }
 }
+
+#if os(iOS)
+private var productsDirectory: URL {
+    for bundle in Bundle.allBundles where bundle.bundleURL.pathExtension == "xctest" {
+        return bundle.bundleURL.deletingLastPathComponent()
+    }
+    fatalError("Products directory not found")
+}
+#endif
