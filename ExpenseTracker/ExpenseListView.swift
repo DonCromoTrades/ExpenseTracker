@@ -4,6 +4,7 @@ import CoreData
 
 struct ExpenseListView: View {
     @Environment(\.managedObjectContext) private var context
+    @EnvironmentObject private var syncController: SyncController
     @FetchRequest(
         entity: Expense.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \Expense.date, ascending: false)],
@@ -56,6 +57,13 @@ struct ExpenseListView: View {
             .searchable(text: $searchText)
         }
         .navigationTitle("Expenses")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { syncController.fetch() }) {
+                    Image(systemName: "arrow.clockwise")
+                }
+            }
+        }
     }
 }
 
