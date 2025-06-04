@@ -24,8 +24,7 @@ ExpenseTracker is an app designed to help you scan receipts, organize expenses, 
 Contributions are welcome! Fork the repository, create a feature branch, and open a pull request.
 
 To run tests, use the Xcode menu `Product` > `Test` or run the following command from the project directory:
-
 ```bash
-xcodebuild test -scheme ExpenseTracker -destination 'platform=iOS Simulator,name=iPhone 14'
+swift test
 ```
 
