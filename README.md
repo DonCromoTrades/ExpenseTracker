@@ -39,6 +39,39 @@ To run tests, use the Xcode menu `Product` > `Test` or run the following command
 swift test
 ```
 
+## Recurring Expenses and Budgets
+
+Two additional Core Data entities help automate common spend tracking tasks:
+
+- **RecurringExpense** – stores expenses that repeat on a schedule. Each record
+  tracks an `id`, `title`, `amount`, the `nextDate` the expense will occur and
+  a `frequency` (for example monthly or weekly).
+- **Budget** – defines spending limits. A budget has an `id`, a `category`, the
+  allowed `monthlyLimit` and the amount already `spent` during the current
+  period.
+
+### Fetching recurring expenses
+
+```swift
+import CoreData
+
+let context = PersistenceController.shared.container.viewContext
+let request: NSFetchRequest<RecurringExpense> = RecurringExpense.fetchRequest()
+let recurring = try context.fetch(request)
+```
+
+### Computing remaining budget
+
+```swift
+let budgetRequest: NSFetchRequest<Budget> = Budget.fetchRequest()
+let budgets = try context.fetch(budgetRequest)
+
+if let groceries = budgets.first(where: { $0.category == "Groceries" }) {
+    let remaining = groceries.monthlyLimit - groceries.spent
+    print("Remaining for groceries: \(remaining)")
+}
+```
+
 
 ## License
 
