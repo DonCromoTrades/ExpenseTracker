@@ -57,8 +57,8 @@ struct ReceiptCaptureView: View {
         ReceiptScanner().scan(image: uiImage) { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let lines):
-                    self.recognizedLines = lines
+                case .success(let data):
+                    self.recognizedLines = data.lines
                 case .failure:
                     self.recognizedLines = []
                 }
