@@ -32,8 +32,8 @@ final class ExpenseTrackerTests: XCTestCase {
         let expectation = expectation(description: "scan")
         ReceiptScanner().scan(image: rotated) { result in
             switch result {
-            case .success(let strings):
-                XCTAssertTrue(strings.contains(where: { $0.contains(text) }))
+            case .success(let data):
+                XCTAssertTrue(data.lines.contains(where: { $0.contains(text) }))
             case .failure(let error):
                 XCTFail("Scanning failed: \(error)")
             }
