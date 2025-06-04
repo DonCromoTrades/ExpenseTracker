@@ -36,6 +36,32 @@ final class PersistenceControllerTests: XCTestCase {
 
         results = try context.fetch(request)
         XCTAssertEqual(results.count, 0)
+
+        // RecurringExpense helpers
+        try controller.addRecurringExpense(title: "Gym", amount: 29.99, frequency: "monthly")
+        let rRequest: NSFetchRequest<RecurringExpense> = RecurringExpense.fetchRequest()
+        var recurring = try context.fetch(rRequest)
+        XCTAssertEqual(recurring.count, 1)
+        XCTAssertEqual(recurring.first?.title, "Gym")
+
+        if let firstRecurring = recurring.first {
+            try controller.deleteRecurringExpense(firstRecurring)
+        }
+        recurring = try context.fetch(rRequest)
+        XCTAssertEqual(recurring.count, 0)
+
+        // Budget helpers
+        try controller.addBudget(category: "Food", limit: 200)
+        let bRequest: NSFetchRequest<Budget> = Budget.fetchRequest()
+        var budgets = try context.fetch(bRequest)
+        XCTAssertEqual(budgets.count, 1)
+        XCTAssertEqual(budgets.first?.category, "Food")
+
+        if let firstBudget = budgets.first {
+            try controller.deleteBudget(firstBudget)
+        }
+        budgets = try context.fetch(bRequest)
+        XCTAssertEqual(budgets.count, 0)
     }
 }
 #endif
