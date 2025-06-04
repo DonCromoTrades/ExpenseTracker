@@ -43,6 +43,25 @@ public struct ExpensesChartView: View {
         monthlyTotals.map(\.total).max() ?? 0
     }
 
+    /// Returns the total expense amounts grouped by month, in ascending order.
+    /// This helper is exposed for testing purposes.
+    public func monthlyTotalValuesForTesting() -> [Double] {
+        let request: NSFetchRequest<Expense> = Expense.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Expense.date, ascending: true)]
+        do {
+            let results = try context.fetch(request)
+            let calendar = Calendar.current
+            let grouped = Dictionary(grouping: results) { expense -> Date in
+                calendar.date(from: calendar.dateComponents([.year, .month], from: expense.date)) ?? expense.date
+            }
+            return grouped
+                .sorted { $0.key < $1.key }
+                .map { (_, expenses) in expenses.reduce(0) { $0 + $1.amount } }
+        } catch {
+            return []
+        }
+    }
+
     private var monthFormatter: DateFormatter {
         let df = DateFormatter()
         df.dateFormat = "MMM"
@@ -71,5 +90,7 @@ import Foundation
 
 public struct ExpensesChartView {
     public init(context: Any? = nil) {}
+
+    public func monthlyTotalValuesForTesting() -> [Double] { [] }
 }
 #endif

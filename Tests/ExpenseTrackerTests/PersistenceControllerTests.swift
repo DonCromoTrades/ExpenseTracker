@@ -65,5 +65,38 @@ final class PersistenceControllerTests: XCTestCase {
         bFetch = try ctx.fetch(Budget.fetchRequest())
         XCTAssertEqual(bFetch.count, 0)
     }
+
+    func testAddRecurringExpenseCreatesObject() throws {
+        let controller = PersistenceController(inMemory: true)
+        let ctx = controller.container.viewContext
+        let start = Date()
+
+        let recurring = try controller.addRecurringExpense(title: "Internet", amount: 60, startDate: start, frequency: "Monthly")
+
+        let fetch: [RecurringExpense] = try ctx.fetch(RecurringExpense.fetchRequest())
+        XCTAssertEqual(fetch.count, 1)
+        if let first = fetch.first {
+            XCTAssertEqual(first.id, recurring.id)
+            XCTAssertEqual(first.title, "Internet")
+            XCTAssertEqual(first.amount, 60)
+            XCTAssertEqual(first.startDate, start)
+            XCTAssertEqual(first.frequency, "Monthly")
+        }
+    }
+
+    func testAddBudgetCreatesObject() throws {
+        let controller = PersistenceController(inMemory: true)
+        let ctx = controller.container.viewContext
+
+        let budget = try controller.addBudget(category: "Travel", limit: 500)
+
+        let fetch: [Budget] = try ctx.fetch(Budget.fetchRequest())
+        XCTAssertEqual(fetch.count, 1)
+        if let first = fetch.first {
+            XCTAssertEqual(first.id, budget.id)
+            XCTAssertEqual(first.category, "Travel")
+            XCTAssertEqual(first.limit, 500)
+        }
+    }
 }
 #endif
