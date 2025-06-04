@@ -30,6 +30,12 @@ device) and press **Run**.
 - Connect an iPhone or iPad and select it as the target device in Xcode.
 - Ensure the deployment target of the project matches or is lower than your device's iOS version.
 
+## User Setup
+
+The app supports signing in with Apple or entering a local name. When building for iOS, enable the **Sign in with Apple** capability in the Xcode project if you would like to use Apple's authentication. A simple local sign-in flow is also provided for simulator testing.
+
+To synchronize expenses across devices, enable the **iCloud** capability with CloudKit. A lightweight `CloudSyncManager` is available in the `ExpenseStore` module that can be expanded to push and fetch records.
+
 ## Contributing and Testing
 
 Contributions are welcome! Fork the repository, create a feature branch, and open a pull request.

@@ -2,21 +2,25 @@ import SwiftUI
 import DataVisualizer
 import ExpenseStore
 import CoreData
+import UserAuth
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var context
+    @StateObject private var userManager = UserManager()
 
     var body: some View {
-        TabView {
-            NavigationView { ExpensesChartView(context: context) }
-                .tabItem { Label("Charts", systemImage: "chart.bar") }
-
-            NavigationView { ExpenseListView() }
-                .environment(\.managedObjectContext, context)
-                .tabItem { Label("Expenses", systemImage: "list.bullet") }
-
-            NavigationView { ReceiptCaptureView() }
-                .tabItem { Label("Scan", systemImage: "camera") }
+        if userManager.currentUser != nil {
+            TabView {
+                NavigationView { ExpensesChartView(context: context) }
+                    .tabItem { Label("Charts", systemImage: "chart.bar") }
+                NavigationView { ExpenseListView() }
+                    .environment(\.managedObjectContext, context)
+                    .tabItem { Label("Expenses", systemImage: "list.bullet") }
+                NavigationView { ReceiptCaptureView() }
+                    .tabItem { Label("Scan", systemImage: "camera") }
+            }
+        } else {
+            SignInView(manager: userManager)
         }
     }
 }
