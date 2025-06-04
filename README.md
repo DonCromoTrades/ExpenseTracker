@@ -29,3 +29,7 @@ To run tests, use the Xcode menu `Product` > `Test` or run the following command
 xcodebuild test -scheme ExpenseTracker -destination 'platform=iOS Simulator,name=iPhone 14'
 ```
 
+
+## License
+
+This project is distributed under a proprietary license. Usage requires a paid license agreement with an initial cost of $1000 and a $25 monthly fee per user. Unauthorized distribution or modification is prohibited.
