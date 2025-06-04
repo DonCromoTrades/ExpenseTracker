@@ -1,5 +1,8 @@
 #if canImport(CoreData)
 import CoreData
+#if canImport(CloudKit)
+import CloudKit
+#endif
 
 public class Expense: NSManagedObject {
     @NSManaged public var id: UUID
@@ -55,6 +58,9 @@ extension Expense {
 public struct PersistenceController {
     public static let shared = PersistenceController()
     public let container: NSPersistentContainer
+#if canImport(CloudKit)
+    public let cloudSync: CloudSyncManager
+#endif
 
     public init(inMemory: Bool = false) {
         let model = Self.managedObjectModel()
@@ -63,6 +69,14 @@ public struct PersistenceController {
             container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
         }
         container.loadPersistentStores { _, _ in }
+#if canImport(CloudKit)
+        if let id = Bundle.main.object(forInfoDictionaryKey: "CloudKitContainerIdentifier") as? String {
+            cloudSync = CloudSyncManager(container: CKContainer(identifier: id), context: container.viewContext)
+        } else {
+            cloudSync = CloudSyncManager(context: container.viewContext)
+        }
+        cloudSync.fetchUpdates { _ in }
+#endif
     }
 
     private static func managedObjectModel() -> NSManagedObjectModel {
@@ -215,6 +229,9 @@ public struct PersistenceController {
         expense.date = date
         expense.category = category
         try container.viewContext.save()
+#if canImport(CloudKit)
+        cloudSync.sync(expenses: [expense]) { _ in }
+#endif
         return expense
     }
 
@@ -264,6 +281,9 @@ public struct PersistenceController {
         expense.category = category
         expense.notes = notes
         try container.viewContext.save()
+#if canImport(CloudKit)
+        cloudSync.sync(expenses: [expense]) { _ in }
+#endif
         return expense
     }
 
@@ -271,7 +291,20 @@ public struct PersistenceController {
         let ctx = container.viewContext
         ctx.delete(expense)
         try ctx.save()
+#if canImport(CloudKit)
+        cloudSync.fetchUpdates { _ in }
+#endif
     }
+
+#if canImport(CloudKit)
+    public func syncExpense(_ expense: Expense) {
+        cloudSync.sync(expenses: [expense]) { _ in }
+    }
+
+    public func fetchCloudUpdates() {
+        cloudSync.fetchUpdates { _ in }
+    }
+#endif
 }
 #else
 import Foundation

@@ -55,6 +55,9 @@ struct ExpenseEditView: View {
                 exp.category = category.isEmpty ? nil : category
                 exp.notes = notes.isEmpty ? nil : notes
                 try context.save()
+#if canImport(CloudKit)
+                persistence.syncExpense(exp)
+#endif
             } else {
                 _ = try persistence.addExpense(title: title, amount: amt, date: date, category: category.isEmpty ? nil : category, notes: notes.isEmpty ? nil : notes)
             }

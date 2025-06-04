@@ -34,7 +34,7 @@ device) and press **Run**.
 
 The app supports signing in with Apple or entering a local name. When building for iOS, enable the **Sign in with Apple** capability in the Xcode project if you would like to use Apple's authentication. A simple local sign-in flow is also provided for simulator testing.
 
-To synchronize expenses across devices, enable the **iCloud** capability with CloudKit. A lightweight `CloudSyncManager` is available in the `ExpenseStore` module that can be expanded to push and fetch records.
+To synchronize expenses across devices, enable the **iCloud** capability with CloudKit. Add the container identifier `iCloud.com.example.ExpenseTracker` to `ExpenseTracker.entitlements` and set the same value for `CloudKitContainerIdentifier` in `Info.plist`. The app will request iCloud permission on first launch and use `CloudSyncManager` to push local changes and fetch updates automatically.
 
 ## Contributing and Testing
 
