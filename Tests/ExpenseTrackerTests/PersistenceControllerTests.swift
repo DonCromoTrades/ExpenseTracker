@@ -13,13 +13,21 @@ final class PersistenceControllerTests: XCTestCase {
         expense.title = "Lunch"
         expense.amount = 9.99
         expense.date = Date()
+        expense.category = "Food"
+        expense.tags = ["meal", "lunch"]
+        expense.notes = "Paid by cash"
 
         try context.save()
 
         let request: NSFetchRequest<Expense> = Expense.fetchRequest()
         var results = try context.fetch(request)
         XCTAssertEqual(results.count, 1)
-        XCTAssertEqual(results.first?.title, "Lunch")
+        if let first = results.first {
+            XCTAssertEqual(first.title, "Lunch")
+            XCTAssertEqual(first.category, "Food")
+            XCTAssertEqual(first.tags ?? [], ["meal", "lunch"])
+            XCTAssertEqual(first.notes, "Paid by cash")
+        }
 
         if let fetchedExpense = results.first {
             context.delete(fetchedExpense)
