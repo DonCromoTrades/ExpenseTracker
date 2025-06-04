@@ -192,6 +192,25 @@ public struct PersistenceController {
         return model
     }
 
+    /// Creates a new `Expense` with the provided values and saves the context.
+    /// - Parameters:
+    ///   - title: The title or vendor of the expense.
+    ///   - amount: Monetary value of the expense.
+    ///   - date: The date the expense occurred.
+    ///   - category: Optional category name.
+    /// - Returns: The newly created `Expense` instance.
+    @discardableResult
+    public func addExpense(title: String, amount: Double, date: Date, category: String? = nil) throws -> Expense {
+        let expense = Expense(context: container.viewContext)
+        expense.id = UUID()
+        expense.title = title
+        expense.amount = amount
+        expense.date = date
+        expense.category = category
+        try container.viewContext.save()
+        return expense
+    }
+
     @discardableResult
     public func addRecurringExpense(title: String, amount: Double, startDate: Date, frequency: String) throws -> RecurringExpense {
         let obj = RecurringExpense(context: container.viewContext)

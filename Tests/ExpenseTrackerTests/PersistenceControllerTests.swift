@@ -98,5 +98,23 @@ final class PersistenceControllerTests: XCTestCase {
             XCTAssertEqual(first.limit, 500)
         }
     }
+
+    func testAddExpenseCreatesObject() throws {
+        let controller = PersistenceController(inMemory: true)
+        let ctx = controller.container.viewContext
+        let date = Date()
+
+        let expense = try controller.addExpense(title: "Coffee", amount: 3.5, date: date, category: "Food")
+
+        let fetch: [Expense] = try ctx.fetch(Expense.fetchRequest())
+        XCTAssertEqual(fetch.count, 1)
+        if let first = fetch.first {
+            XCTAssertEqual(first.id, expense.id)
+            XCTAssertEqual(first.title, "Coffee")
+            XCTAssertEqual(first.amount, 3.5)
+            XCTAssertEqual(first.date, date)
+            XCTAssertEqual(first.category, "Food")
+        }
+    }
 }
 #endif

@@ -23,6 +23,7 @@ struct ContentView: View {
                     .environment(\.managedObjectContext, context)
                     .tabItem { Label("Recurring", systemImage: "repeat") }
                 NavigationView { ReceiptCaptureView() }
+                    .environment(\.managedObjectContext, context)
                     .tabItem { Label("Scan", systemImage: "camera") }
             }
         } else {
