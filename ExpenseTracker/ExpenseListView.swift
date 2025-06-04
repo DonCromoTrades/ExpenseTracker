@@ -4,6 +4,7 @@ import CoreData
 
 struct ExpenseListView: View {
     @Environment(\.managedObjectContext) private var context
+    private let persistence: PersistenceController
     @FetchRequest(
         entity: Expense.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \Expense.date, ascending: false)],
@@ -11,6 +12,12 @@ struct ExpenseListView: View {
     ) private var fetchedExpenses: FetchedResults<Expense>
     @State private var searchText: String = ""
     @State private var sortOption: SortOption = .date
+    @State private var showEditor = false
+    @State private var editingExpense: Expense?
+
+    init(persistence: PersistenceController = .shared) {
+        self.persistence = persistence
+    }
 
     enum SortOption: String, CaseIterable, Identifiable {
         case date = "Date"
@@ -51,11 +58,27 @@ struct ExpenseListView: View {
                         Spacer()
                         Text(expense.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                     }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        editingExpense = expense
+                        showEditor = true
+                    }
                 }
             }
             .searchable(text: $searchText)
         }
         .navigationTitle("Expenses")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { editingExpense = nil; showEditor = true }) {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showEditor) {
+            ExpenseEditView(expense: editingExpense, persistence: persistence)
+                .environment(\.managedObjectContext, context)
+        }
     }
 }
 
