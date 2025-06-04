@@ -114,6 +114,7 @@ struct RecurringExpenseEditView: View {
                 exp.title = title
                 exp.amount = amt
                 exp.startDate = startDate
+                exp.nextDate = startDate
                 exp.frequency = frequency.rawValue
                 try context.save()
             } else {
