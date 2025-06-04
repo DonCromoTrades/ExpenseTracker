@@ -19,6 +19,11 @@ struct ExpenseTrackerApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .onAppear {
+#if canImport(CloudKit)
+                    persistenceController.fetchCloudUpdates()
+#endif
+                }
         }
     }
 }
