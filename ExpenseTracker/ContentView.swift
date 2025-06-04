@@ -19,6 +19,9 @@ struct ContentView: View {
                 NavigationView { BudgetListView() }
                     .environment(\.managedObjectContext, context)
                     .tabItem { Label("Budgets", systemImage: "dollarsign.circle") }
+                NavigationView { BudgetProgressView() }
+                    .environment(\.managedObjectContext, context)
+                    .tabItem { Label("Progress", systemImage: "chart.pie") }
                 NavigationView { RecurringExpenseListView() }
                     .environment(\.managedObjectContext, context)
                     .tabItem { Label("Recurring", systemImage: "repeat") }
