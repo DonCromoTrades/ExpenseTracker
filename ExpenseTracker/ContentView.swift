@@ -1,12 +1,19 @@
 import SwiftUI
+import DataVisualizer
+import ExpenseStore
+import CoreData
 
 struct ContentView: View {
+    @Environment(\.managedObjectContext) private var context
+
     var body: some View {
-        Text("Hello, SwiftUI!")
+        ExpensesChartView(context: context)
             .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    let context = PersistenceController.shared.container.viewContext
+    return ContentView()
+        .environment(\.managedObjectContext, context)
 }
