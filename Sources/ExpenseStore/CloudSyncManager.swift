@@ -3,8 +3,15 @@ import CloudKit
 import CoreData
 
 public protocol CKDatabaseProtocol {
-    func save(_ record: CKRecord, completionHandler: @escaping (CKRecord?, Error?) -> Void)
-    func perform(_ query: CKQuery, inZoneWith zoneID: CKRecordZone.ID?, completionHandler: @escaping ([CKRecord]?, Error?) -> Void)
+    func save(
+        _ record: CKRecord,
+        completionHandler: @Sendable @escaping (CKRecord?, Error?) -> Void
+    )
+    func perform(
+        _ query: CKQuery,
+        inZoneWith zoneID: CKRecordZone.ID?,
+        completionHandler: @Sendable @escaping ([CKRecord]?, Error?) -> Void
+    )
 }
 
 extension CKDatabase: CKDatabaseProtocol {}
