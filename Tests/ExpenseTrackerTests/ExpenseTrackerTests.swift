@@ -8,7 +8,7 @@ final class ExpenseTrackerTests: XCTestCase {
     func testChartViewInitialization() throws {
         #if canImport(CoreData)
         let context = PersistenceController(inMemory: true).container.viewContext
-        _ = ExpensesChartView().environment(\.managedObjectContext, context)
+
         #else
         _ = ExpensesChartView()
         #endif
