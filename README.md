@@ -52,9 +52,10 @@ Two additional Core Data entities help automate common spend tracking tasks:
 - **RecurringExpense** – stores expenses that repeat on a schedule. Each record
   tracks an `id`, `title`, `amount`, the `nextDate` the expense will occur and
   a `frequency` (for example monthly or weekly).
-- **Budget** – defines spending limits. A budget has an `id`, a `category`, the
-  allowed `monthlyLimit` and the amount already `spent` during the current
-  period.
+- **Budget** – defines spending limits for a category. Each budget stores an
+  `id`, the name of the `category`, and a numeric `limit` for the current
+  period. Spending for the budget is derived by summing expenses with the same
+  category during the month.
 
 ### Fetching recurring expenses
 
@@ -73,7 +74,18 @@ let budgetRequest: NSFetchRequest<Budget> = Budget.fetchRequest()
 let budgets = try context.fetch(budgetRequest)
 
 if let groceries = budgets.first(where: { $0.category == "Groceries" }) {
-    let remaining = groceries.monthlyLimit - groceries.spent
+    // Sum expenses for the category this month
+    let expReq: NSFetchRequest<Expense> = Expense.fetchRequest()
+    let cal = Calendar.current
+    let start = cal.date(from: cal.dateComponents([.year, .month], from: Date()))!
+    let end = cal.date(byAdding: .month, value: 1, to: start)!
+    expReq.predicate = NSPredicate(
+        format: "category == %@ AND date >= %@ AND date < %@",
+        groceries.category, start as NSDate, end as NSDate)
+    let expenses = try context.fetch(expReq)
+    let spent = expenses.reduce(0) { $0 + $1.amount }
+
+    let remaining = groceries.limit - spent
     print("Remaining for groceries: \(remaining)")
 }
 ```
