@@ -32,6 +32,7 @@ final class ExpensesChartViewTests: XCTestCase {
         try ctx.save()
 
         let view = ExpensesChartView(context: ctx)
+            .environment(\.managedObjectContext, ctx)
         let totals = view.monthlyTotalValuesForTesting()
         XCTAssertEqual(totals, [30, 20])
     }
