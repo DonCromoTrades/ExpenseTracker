@@ -4,22 +4,14 @@ import CoreData
 import ExpenseStore
 
 public struct ExpensesChartView: View {
+    @Environment(\.managedObjectContext) private var context
     @FetchRequest private var expenses: FetchedResults<Expense>
-    private let context: NSManagedObjectContext
 
-    public init(context: NSManagedObjectContext? = nil) {
-        if let ctx = context {
-            self.context = ctx
-        } else {
-            self.context = PersistenceController(inMemory: true).container.viewContext
-        }
-        _expenses = FetchRequest(
-            entity: Expense.entity(),
-            sortDescriptors: [NSSortDescriptor(keyPath: \Expense.date, ascending: true)],
-            animation: .default,
-            predicate: nil,
-            managedObjectContext: self.context
-        )
+    public init() {
+        var request: NSFetchRequest<Expense> = Expense.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Expense.date, ascending: true)]
+        request.predicate = nil
+        _expenses = FetchRequest(fetchRequest: request, animation: .default)
     }
 
     struct MonthTotal: Identifiable {
@@ -45,7 +37,7 @@ public struct ExpensesChartView: View {
 
     /// Returns the total expense amounts grouped by month, in ascending order.
     /// This helper is exposed for testing purposes.
-    public func monthlyTotalValuesForTesting() -> [Double] {
+    public func monthlyTotalValuesForTesting(in context: NSManagedObjectContext) -> [Double] {
         let request: NSFetchRequest<Expense> = Expense.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(keyPath: \Expense.date, ascending: true)]
         do {
@@ -89,8 +81,8 @@ public struct ExpensesChartView: View {
 import Foundation
 
 public struct ExpensesChartView {
-    public init(context: Any? = nil) {}
+    public init() {}
 
-    public func monthlyTotalValuesForTesting() -> [Double] { [] }
+    public func monthlyTotalValuesForTesting(in context: Any? = nil) -> [Double] { [] }
 }
 #endif
