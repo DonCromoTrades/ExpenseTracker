@@ -7,7 +7,9 @@ import ExpenseStore
 
 final class ExpensesChartViewTests: XCTestCase {
     func testViewInitialization() {
-        let view = ExpensesChartView()
+        let controller = PersistenceController(inMemory: true)
+        let ctx = controller.container.viewContext
+        let view = ExpensesChartView().environment(\.managedObjectContext, ctx)
         XCTAssertNotNil(view)
     }
 
@@ -31,8 +33,7 @@ final class ExpensesChartViewTests: XCTestCase {
 
         try ctx.save()
 
-        let view = ExpensesChartView(context: ctx)
-        let totals = view.monthlyTotalValuesForTesting()
+        let totals = ExpensesChartView().monthlyTotalValuesForTesting(in: ctx)
         XCTAssertEqual(totals, [30, 20])
     }
 }

@@ -11,7 +11,8 @@ struct ContentView: View {
     var body: some View {
         if userManager.currentUser != nil {
             TabView {
-                NavigationView { ExpensesChartView(context: context) }
+                NavigationView { ExpensesChartView() }
+                    .environment(\.managedObjectContext, context)
                     .tabItem { Label("Charts", systemImage: "chart.bar") }
                 NavigationView { ExpenseListView() }
                     .environment(\.managedObjectContext, context)
