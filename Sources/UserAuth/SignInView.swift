@@ -1,5 +1,8 @@
 #if canImport(SwiftUI)
 import SwiftUI
+#if canImport(AuthenticationServices)
+import AuthenticationServices
+#endif
 
 public struct SignInView: View {
     @ObservedObject private var manager: UserManager
