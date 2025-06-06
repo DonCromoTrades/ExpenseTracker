@@ -1,27 +1,22 @@
-#if canImport(CoreData)
+#if canImport(SwiftData)
 import XCTest
-import CoreData
-@testable import ExpenseStore
+import SwiftData
+import ExpenseStore
 
 final class PersistenceControllerTests: XCTestCase {
     func testCRUDOperations() throws {
-        let controller = PersistenceController(inMemory: true)
-        let context = controller.container.viewContext
+        let container = try ModelContainer(for: ExpenseModel.self,
+                                           RecurringExpenseModel.self,
+                                           BudgetModel.self,
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let context = container.mainContext
 
-        let expense = Expense(context: context)
-        expense.id = UUID()
-        expense.title = "Lunch"
-        expense.amount = 9.99
-        expense.date = Date()
-        expense.category = "Food"
-        expense.tags = ["meal", "lunch"]
-        expense.notes = "Paid by cash"
-        expense.frequency = .weekly
-
+        let expense = ExpenseModel(title: "Lunch", amount: 9.99, date: Date(), category: "Food", tags: ["meal", "lunch"], notes: "Paid by cash", frequency: .weekly)
+        context.insert(expense)
         try context.save()
 
-        let request: NSFetchRequest<Expense> = Expense.fetchRequest()
-        var results = try context.fetch(request)
+        let descriptor = FetchDescriptor<ExpenseModel>()
+        var results = try context.fetch(descriptor)
         XCTAssertEqual(results.count, 1)
         if let first = results.first {
             XCTAssertEqual(first.title, "Lunch")
@@ -36,44 +31,53 @@ final class PersistenceControllerTests: XCTestCase {
             try context.save()
         }
 
-        results = try context.fetch(request)
+        results = try context.fetch(descriptor)
         XCTAssertEqual(results.count, 0)
     }
 
     func testRecurringAndBudgetHelpers() throws {
-        let controller = PersistenceController(inMemory: true)
-        let ctx = controller.container.viewContext
+        let container = try ModelContainer(for: ExpenseModel.self,
+                                           RecurringExpenseModel.self,
+                                           BudgetModel.self,
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let ctx = container.mainContext
 
         // Recurring Expense
-        let recurring = try controller.addRecurringExpense(title: "Gym", amount: 50, startDate: Date(), frequency: "Weekly")
+        let recurring = RecurringExpenseModel(title: "Gym", amount: 50, startDate: Date(), frequency: "Weekly")
+        ctx.insert(recurring)
 
-        var reFetch: [RecurringExpense] = try ctx.fetch(RecurringExpense.fetchRequest())
+        var reFetch = try ctx.fetch(FetchDescriptor<RecurringExpenseModel>())
         XCTAssertEqual(reFetch.count, 1)
         XCTAssertEqual(reFetch.first?.title, "Gym")
 
-        try controller.deleteRecurringExpense(recurring)
-        reFetch = try ctx.fetch(RecurringExpense.fetchRequest())
+        ctx.delete(recurring)
+        reFetch = try ctx.fetch(FetchDescriptor<RecurringExpenseModel>())
         XCTAssertEqual(reFetch.count, 0)
 
         // Budget
-        let budget = try controller.addBudget(category: "Food", limit: 200)
-        var bFetch: [Budget] = try ctx.fetch(Budget.fetchRequest())
+        let budget = BudgetModel(category: "Food", limit: 200)
+        ctx.insert(budget)
+        var bFetch = try ctx.fetch(FetchDescriptor<BudgetModel>())
         XCTAssertEqual(bFetch.count, 1)
         XCTAssertEqual(bFetch.first?.category, "Food")
 
-        try controller.deleteBudget(budget)
-        bFetch = try ctx.fetch(Budget.fetchRequest())
+        ctx.delete(budget)
+        bFetch = try ctx.fetch(FetchDescriptor<BudgetModel>())
         XCTAssertEqual(bFetch.count, 0)
     }
 
     func testAddRecurringExpenseCreatesObject() throws {
-        let controller = PersistenceController(inMemory: true)
-        let ctx = controller.container.viewContext
+        let container = try ModelContainer(for: ExpenseModel.self,
+                                           RecurringExpenseModel.self,
+                                           BudgetModel.self,
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let ctx = container.mainContext
         let start = Date()
 
-        let recurring = try controller.addRecurringExpense(title: "Internet", amount: 60, startDate: start, frequency: "Monthly")
+        let recurring = RecurringExpenseModel(title: "Internet", amount: 60, startDate: start, frequency: "Monthly")
+        ctx.insert(recurring)
 
-        let fetch: [RecurringExpense] = try ctx.fetch(RecurringExpense.fetchRequest())
+        let fetch = try ctx.fetch(FetchDescriptor<RecurringExpenseModel>())
         XCTAssertEqual(fetch.count, 1)
         if let first = fetch.first {
             XCTAssertEqual(first.id, recurring.id)
@@ -85,12 +89,16 @@ final class PersistenceControllerTests: XCTestCase {
     }
 
     func testAddBudgetCreatesObject() throws {
-        let controller = PersistenceController(inMemory: true)
-        let ctx = controller.container.viewContext
+        let container = try ModelContainer(for: ExpenseModel.self,
+                                           RecurringExpenseModel.self,
+                                           BudgetModel.self,
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let ctx = container.mainContext
 
-        let budget = try controller.addBudget(category: "Travel", limit: 500)
+        let budget = BudgetModel(category: "Travel", limit: 500)
+        ctx.insert(budget)
 
-        let fetch: [Budget] = try ctx.fetch(Budget.fetchRequest())
+        let fetch = try ctx.fetch(FetchDescriptor<BudgetModel>())
         XCTAssertEqual(fetch.count, 1)
         if let first = fetch.first {
             XCTAssertEqual(first.id, budget.id)
@@ -100,13 +108,17 @@ final class PersistenceControllerTests: XCTestCase {
     }
 
     func testAddExpenseCreatesObject() throws {
-        let controller = PersistenceController(inMemory: true)
-        let ctx = controller.container.viewContext
+        let container = try ModelContainer(for: ExpenseModel.self,
+                                           RecurringExpenseModel.self,
+                                           BudgetModel.self,
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let ctx = container.mainContext
         let date = Date()
 
-        let expense = try controller.addExpense(title: "Coffee", amount: 3.5, date: date, category: "Food")
+        let expense = ExpenseModel(title: "Coffee", amount: 3.5, date: date, category: "Food")
+        ctx.insert(expense)
 
-        let fetch: [Expense] = try ctx.fetch(Expense.fetchRequest())
+        let fetch = try ctx.fetch(FetchDescriptor<ExpenseModel>())
         XCTAssertEqual(fetch.count, 1)
         if let first = fetch.first {
             XCTAssertEqual(first.id, expense.id)
