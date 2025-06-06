@@ -66,6 +66,7 @@ public final class Budget {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
+@MainActor
 public struct PersistenceController {
     public static let shared = PersistenceController()
     public let container: ModelContainer
