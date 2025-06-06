@@ -1,12 +1,12 @@
-#if canImport(CoreData)
+#if canImport(SwiftData)
 import Foundation
-import CoreData
+import SwiftData
 
 public class RecurringExpenseScheduler {
-    private let context: NSManagedObjectContext
+    private let context: ModelContext
     private let calendar = Calendar.current
 
-    public init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
+    public init(context: ModelContext = PersistenceController.shared.container.mainContext) {
         self.context = context
     }
 
@@ -25,22 +25,16 @@ public class RecurringExpenseScheduler {
 
     /// Checks for due recurring expenses and creates `Expense` records.
     public func processDueExpenses(asOf date: Date = Date()) throws {
-        let request: NSFetchRequest<RecurringExpense> = RecurringExpense.fetchRequest()
-        request.predicate = NSPredicate(format: "nextDate <= %@", date as NSDate)
-        let items = try context.fetch(request)
+        let descriptor = FetchDescriptor<RecurringExpense>(predicate: #Predicate { $0.nextDate <= date })
+        let items = try context.fetch(descriptor)
         for item in items {
-            let expense = Expense(context: context)
-            expense.id = UUID()
-            expense.title = item.title
-            expense.amount = item.amount
-            expense.date = item.nextDate
+            let expense = Expense(title: item.title, amount: item.amount, date: item.nextDate)
+            context.insert(expense)
             if let freq = RecurrenceFrequency(rawValue: item.frequency) {
                 item.nextDate = advanceDate(item.nextDate, frequency: freq)
             }
         }
-        if context.hasChanges {
-            try context.save()
-        }
+        try context.save()
     }
 }
 #endif
