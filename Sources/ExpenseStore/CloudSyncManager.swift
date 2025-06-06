@@ -16,6 +16,7 @@ public protocol CKDatabaseProtocol {
 
 extension CKDatabase: CKDatabaseProtocol {}
 
+@available(iOS 17.0, macOS 14.0, *)
 public class CloudSyncManager {
     private let database: CKDatabaseProtocol
     private let context: ModelContext

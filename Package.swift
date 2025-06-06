@@ -6,7 +6,8 @@ import PackageDescription
 let package = Package(
     name: "ExpenseTracker",
     platforms: [
-        .iOS(.v17)
+        .iOS(.v17),
+        .macOS(.v14)
     ],
     products: [
         .library(name: "ReceiptScanner", targets: ["ReceiptScanner"]),

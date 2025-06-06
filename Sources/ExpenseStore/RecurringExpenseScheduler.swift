@@ -2,6 +2,7 @@
 import Foundation
 import SwiftData
 
+@available(iOS 17.0, macOS 14.0, *)
 public class RecurringExpenseScheduler {
     private let context: ModelContext
     private let calendar = Calendar.current

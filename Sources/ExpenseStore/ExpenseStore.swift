@@ -4,6 +4,7 @@ import SwiftData
 import CloudKit
 #endif
 
+@available(iOS 17.0, macOS 14.0, *)
 @Model
 public final class Expense {
     @Attribute(.unique) public var id: UUID
@@ -29,6 +30,7 @@ public final class Expense {
     }
 }
 
+@available(iOS 17.0, macOS 14.0, *)
 @Model
 public final class RecurringExpense {
     @Attribute(.unique) public var id: UUID
@@ -49,6 +51,7 @@ public final class RecurringExpense {
     }
 }
 
+@available(iOS 17.0, macOS 14.0, *)
 @Model
 public final class Budget {
     @Attribute(.unique) public var id: UUID
@@ -62,6 +65,7 @@ public final class Budget {
     }
 }
 
+@available(iOS 17.0, macOS 14.0, *)
 public struct PersistenceController {
     public static let shared = PersistenceController()
     public let container: ModelContainer
