@@ -3,6 +3,7 @@ import SwiftUI
 import SwiftData
 import ExpenseStore
 
+@available(iOS 17.0, macOS 14.0, *)
 public struct ExpensesChartView: View {
     @Environment(\.modelContext) private var context
 
