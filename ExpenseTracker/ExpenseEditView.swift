@@ -3,7 +3,7 @@ import ExpenseStore
 
 struct ExpenseEditView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
     var expense: Expense?
 
@@ -54,13 +54,11 @@ struct ExpenseEditView: View {
                 exp.date = date
                 exp.category = category.isEmpty ? nil : category
                 exp.notes = notes.isEmpty ? nil : notes
-                try context.save()
-#if canImport(CloudKit)
-                persistence.syncExpense(exp)
-#endif
             } else {
-                _ = try persistence.addExpense(title: title, amount: amt, date: date, category: category.isEmpty ? nil : category, notes: notes.isEmpty ? nil : notes)
+                let exp = Expense(title: title, amount: amt, date: date, category: category.isEmpty ? nil : category, notes: notes.isEmpty ? nil : notes)
+                context.insert(exp)
             }
+            try context.save()
             dismiss()
         } catch {
             print("Save error: \(error)")
@@ -78,6 +76,6 @@ struct ExpenseEditView: View {
     exp.amount = 4.5
     exp.date = Date()
     return ExpenseEditView(expense: exp, persistence: controller)
-        .environment(\.managedObjectContext, ctx)
+        .environment(\.modelContext, ctx)
 }
 #endif

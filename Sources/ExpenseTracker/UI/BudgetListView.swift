@@ -5,8 +5,11 @@ import ExpenseStore
 
 struct BudgetListView: View {
     @Environment(\.modelContext) private var context
+    
     private let persistence: PersistenceController
+  
     @Query(sort: [SortDescriptor(\.category)]) private var budgets: [Budget]
+
 
     @State private var showEditor = false
     @State private var editingBudget: Budget?
@@ -49,8 +52,9 @@ struct BudgetListView: View {
     private func removeBudget(at offsets: IndexSet) {
         for index in offsets {
             let budget = budgets[index]
-            try? persistence.deleteBudget(budget)
+            context.delete(budget)
         }
+        try? context.save()
     }
 }
 
@@ -95,10 +99,11 @@ struct BudgetEditView: View {
             if let budget = budget {
                 budget.category = category
                 budget.limit = amount
-                try context.save()
             } else {
-                _ = try persistence.addBudget(category: category, limit: amount)
+                let budget = Budget(category: category, limit: amount)
+                context.insert(budget)
             }
+            try context.save()
             dismiss()
         } catch {
             print("Save error: \(error)")

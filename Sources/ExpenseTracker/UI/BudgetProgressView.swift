@@ -25,11 +25,13 @@ struct BudgetProgressView: View {
     }
 
     private func spending(for budget: Budget) -> Double {
-        let descriptor = FetchDescriptor<Expense>(predicate: #Predicate { $0.category == budget.category && $0.date >= startOfMonth && $0.date < nextMonth })
         let cal = Calendar.current
         let startOfMonth = cal.date(from: cal.dateComponents([.year, .month], from: Date())) ?? Date()
         let nextMonth = cal.date(byAdding: .month, value: 1, to: startOfMonth) ?? Date()
-        req.predicate = NSPredicate(format: "category == %@ AND date >= %@ AND date < %@", budget.category, startOfMonth as NSDate, nextMonth as NSDate)
+        let predicate = #Predicate<Expense> { exp in
+            exp.category == budget.category && exp.date >= startOfMonth && exp.date < nextMonth
+        }
+        let descriptor = FetchDescriptor<Expense>(predicate: predicate)
         let expenses = (try? context.fetch(descriptor)) ?? []
         return expenses.reduce(0) { $0 + $1.amount }
     }

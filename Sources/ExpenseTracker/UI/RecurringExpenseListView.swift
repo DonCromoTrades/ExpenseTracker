@@ -6,6 +6,7 @@ import ExpenseStore
 struct RecurringExpenseListView: View {
     @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
+
     @Query(sort: [SortDescriptor(\.startDate)]) private var expenses: [RecurringExpense]
 
     @State private var showEditor = false
@@ -53,8 +54,9 @@ struct RecurringExpenseListView: View {
     private func removeExpense(at offsets: IndexSet) {
         for index in offsets {
             let ex = expenses[index]
-            try? persistence.deleteRecurringExpense(ex)
+            context.delete(ex)
         }
+        try? context.save()
     }
 }
 
@@ -112,10 +114,11 @@ struct RecurringExpenseEditView: View {
                 exp.startDate = startDate
                 exp.nextDate = startDate
                 exp.frequency = frequency.rawValue
-                try context.save()
             } else {
-                _ = try persistence.addRecurringExpense(title: title, amount: amt, startDate: startDate, frequency: frequency.rawValue)
+                let exp = RecurringExpense(title: title, amount: amt, startDate: startDate, nextDate: startDate, frequency: frequency.rawValue)
+                context.insert(exp)
             }
+            try context.save()
             dismiss()
         } catch {
             print("Save error: \(error)")

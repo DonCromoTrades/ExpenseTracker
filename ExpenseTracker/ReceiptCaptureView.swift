@@ -1,9 +1,10 @@
 import SwiftUI
 import ReceiptScanner
 import ExpenseStore
+import SwiftData
 
 struct ReceiptCaptureView: View {
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     private let persistence: PersistenceController
 
@@ -98,7 +99,9 @@ struct ReceiptCaptureView: View {
     private func save() {
         guard let amt = Double(amount) else { return }
         do {
-            _ = try persistence.addExpense(title: title, amount: amt, date: date, category: category.isEmpty ? nil : category)
+            let exp = Expense(title: title, amount: amt, date: date, category: category.isEmpty ? nil : category)
+            context.insert(exp)
+            try context.save()
             dismiss()
         } catch {
             print("Save error: \(error)")
@@ -142,5 +145,5 @@ private struct ImagePicker: UIViewControllerRepresentable {
     let controller = PersistenceController(inMemory: true)
     let ctx = controller.container.viewContext
     return NavigationView { ReceiptCaptureView(persistence: controller) }
-        .environment(\.managedObjectContext, ctx)
+        .environment(\.modelContext, ctx)
 }

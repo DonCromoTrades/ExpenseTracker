@@ -2,32 +2,33 @@ import SwiftUI
 import DataVisualizer
 import ExpenseStore
 import CoreData
+import SwiftData
 import UserAuth
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     @StateObject private var userManager = UserManager()
 
     var body: some View {
         if userManager.currentUser != nil {
             TabView {
                 NavigationView { ExpensesChartView() }
-                    .environment(\.managedObjectContext, context)
+                    .environment(\.modelContext, context)
                     .tabItem { Label("Charts", systemImage: "chart.bar") }
                 NavigationView { ExpenseListView() }
-                    .environment(\.managedObjectContext, context)
+                    .environment(\.modelContext, context)
                     .tabItem { Label("Expenses", systemImage: "list.bullet") }
                 NavigationView { BudgetListView() }
-                    .environment(\.managedObjectContext, context)
+                    .environment(\.modelContext, context)
                     .tabItem { Label("Budgets", systemImage: "dollarsign.circle") }
                 NavigationView { BudgetProgressView() }
-                    .environment(\.managedObjectContext, context)
+                    .environment(\.modelContext, context)
                     .tabItem { Label("Progress", systemImage: "chart.pie") }
                 NavigationView { RecurringExpenseListView() }
-                    .environment(\.managedObjectContext, context)
+                    .environment(\.modelContext, context)
                     .tabItem { Label("Recurring", systemImage: "repeat") }
                 NavigationView { ReceiptCaptureView() }
-                    .environment(\.managedObjectContext, context)
+                    .environment(\.modelContext, context)
                     .tabItem { Label("Scan", systemImage: "camera") }
             }
         } else {
@@ -47,5 +48,5 @@ struct ContentView: View {
         exp.date = Calendar.current.date(byAdding: .month, value: -i, to: Date())!
     }
     try? context.save()
-    return ContentView().environment(\.managedObjectContext, context)
+    return ContentView().environment(\.modelContext, context)
 }

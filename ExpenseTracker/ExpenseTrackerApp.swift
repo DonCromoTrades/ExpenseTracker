@@ -1,5 +1,6 @@
 import SwiftUI
 import ExpenseStore
+import SwiftData
 
 @main
 struct ExpenseTrackerApp: App {
@@ -18,7 +19,7 @@ struct ExpenseTrackerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.modelContext, persistenceController.container.viewContext)
                 .onAppear {
 #if canImport(CloudKit)
                     persistenceController.fetchCloudUpdates()

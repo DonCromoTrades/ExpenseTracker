@@ -1,15 +1,12 @@
 import SwiftUI
 import ExpenseStore
-import CoreData
+import SwiftData
 
 struct ExpenseListView: View {
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
-    @FetchRequest(
-        entity: Expense.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Expense.date, ascending: false)],
-        animation: .default
-    ) private var fetchedExpenses: FetchedResults<Expense>
+    @Query(sort: \Expense.date, order: .reverse)
+    private var fetchedExpenses: [Expense]
     @State private var searchText: String = ""
     @State private var sortOption: SortOption = .date
     @State private var showEditor = false
@@ -77,7 +74,7 @@ struct ExpenseListView: View {
         }
         .sheet(isPresented: $showEditor) {
             ExpenseEditView(expense: editingExpense, persistence: persistence)
-                .environment(\.managedObjectContext, context)
+                .environment(\.modelContext, context)
         }
     }
 }
@@ -93,5 +90,5 @@ struct ExpenseListView: View {
         exp.date = Calendar.current.date(byAdding: .day, value: -i, to: Date())!
     }
     try? viewContext.save()
-    return NavigationView { ExpenseListView().environment(\.managedObjectContext, viewContext) }
+    return NavigationView { ExpenseListView().environment(\.modelContext, viewContext) }
 }
