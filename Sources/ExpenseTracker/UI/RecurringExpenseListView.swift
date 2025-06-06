@@ -1,16 +1,12 @@
-#if canImport(SwiftUI) && canImport(CoreData)
+#if canImport(SwiftUI) && canImport(SwiftData)
 import SwiftUI
-import CoreData
+import SwiftData
 import ExpenseStore
 
 struct RecurringExpenseListView: View {
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
-    @FetchRequest(
-        entity: RecurringExpense.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \RecurringExpense.startDate, ascending: true)],
-        animation: .default
-    ) private var expenses: FetchedResults<RecurringExpense>
+    @Query(sort: [SortDescriptor(\.startDate)]) private var expenses: [RecurringExpense]
 
     @State private var showEditor = false
     @State private var editingExpense: RecurringExpense?
@@ -50,7 +46,7 @@ struct RecurringExpenseListView: View {
         }
         .sheet(isPresented: $showEditor) {
             RecurringExpenseEditView(expense: editingExpense, persistence: persistence)
-                .environment(\.managedObjectContext, context)
+                .environment(\.modelContext, context)
         }
     }
 
@@ -64,7 +60,7 @@ struct RecurringExpenseListView: View {
 
 struct RecurringExpenseEditView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
     var expense: RecurringExpense?
 
@@ -129,9 +125,9 @@ struct RecurringExpenseEditView: View {
 
 #Preview {
     let controller = PersistenceController(inMemory: true)
-    let ctx = controller.container.viewContext
+    let ctx = controller.container.mainContext
     _ = try? controller.addRecurringExpense(title: "Gym", amount: 50, startDate: Date(), frequency: "Weekly")
     return NavigationView { RecurringExpenseListView(persistence: controller) }
-        .environment(\.managedObjectContext, ctx)
+        .environment(\.modelContext, ctx)
 }
 #endif

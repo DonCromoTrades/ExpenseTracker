@@ -1,28 +1,25 @@
-#if canImport(SwiftUI) && canImport(CoreData)
+#if canImport(SwiftUI) && canImport(SwiftData)
 import XCTest
 import SwiftUI
-import CoreData
+import SwiftData
 import ExpenseStore
 @testable import DataVisualizer
 
 final class ExpensesChartViewTests: XCTestCase {
     func testViewInitialization() {
         let controller = PersistenceController(inMemory: true)
-        let ctx = controller.container.viewContext
-        let view = ExpensesChartView().environment(\.managedObjectContext, ctx)
+        let ctx = controller.container.mainContext
+        let view = ExpensesChartView().environment(\.modelContext, ctx)
         XCTAssertNotNil(view)
     }
 
     func testMonthlyTotalsSummarization() throws {
         let controller = PersistenceController(inMemory: true)
-        let ctx = controller.container.viewContext
+        let ctx = controller.container.mainContext
 
         func makeExpense(amount: Double, date: Date) {
-            let expense = Expense(context: ctx)
-            expense.id = UUID()
-            expense.title = "tmp"
-            expense.amount = amount
-            expense.date = date
+            let expense = Expense(title: "tmp", amount: amount, date: date)
+            ctx.insert(expense)
         }
 
         let cal = Calendar.current

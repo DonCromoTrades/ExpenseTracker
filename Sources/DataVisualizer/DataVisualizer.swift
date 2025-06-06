@@ -1,18 +1,13 @@
-#if canImport(SwiftUI) && canImport(CoreData)
+#if canImport(SwiftUI) && canImport(SwiftData)
 import SwiftUI
-import CoreData
+import SwiftData
 import ExpenseStore
 
 public struct ExpensesChartView: View {
-    @Environment(\.managedObjectContext) private var context
-    @FetchRequest private var expenses: FetchedResults<Expense>
+    @Environment(\.modelContext) private var context
+    @Query(sort: [SortDescriptor(\.date)]) private var expenses: [Expense]
 
-    public init() {
-        var request: NSFetchRequest<Expense> = Expense.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \Expense.date, ascending: true)]
-        request.predicate = nil
-        _expenses = FetchRequest(fetchRequest: request, animation: .default)
-    }
+    public init() {}
 
     struct MonthTotal: Identifiable {
         let id = UUID()
@@ -37,11 +32,10 @@ public struct ExpensesChartView: View {
 
     /// Returns the total expense amounts grouped by month, in ascending order.
     /// This helper is exposed for testing purposes.
-    public func monthlyTotalValuesForTesting(in context: NSManagedObjectContext) -> [Double] {
-        let request: NSFetchRequest<Expense> = Expense.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \Expense.date, ascending: true)]
+    public func monthlyTotalValuesForTesting(in context: ModelContext) -> [Double] {
+        let descriptor = FetchDescriptor<Expense>(sortBy: [SortDescriptor(\.date, order: .forward)])
         do {
-            let results = try context.fetch(request)
+            let results = try context.fetch(descriptor)
             let calendar = Calendar.current
             let grouped = Dictionary(grouping: results) { expense -> Date in
                 calendar.date(from: calendar.dateComponents([.year, .month], from: expense.date)) ?? expense.date
