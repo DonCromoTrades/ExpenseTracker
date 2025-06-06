@@ -1,7 +1,7 @@
-#if canImport(SwiftUI) && canImport(CoreData)
+#if canImport(SwiftUI)
 import XCTest
 import SwiftUI
-import CoreData
+import SwiftData
 import ExpenseStore
 @testable import DataVisualizer
 
@@ -9,7 +9,7 @@ final class ExpensesChartViewTests: XCTestCase {
     func testViewInitialization() {
         let controller = PersistenceController(inMemory: true)
         let ctx = controller.container.viewContext
-        let view = ExpensesChartView().environment(\.managedObjectContext, ctx)
+        let view = ExpensesChartView().environment(\.modelContext, ctx)
         XCTAssertNotNil(view)
     }
 
@@ -18,11 +18,8 @@ final class ExpensesChartViewTests: XCTestCase {
         let ctx = controller.container.viewContext
 
         func makeExpense(amount: Double, date: Date) {
-            let expense = Expense(context: ctx)
-            expense.id = UUID()
-            expense.title = "tmp"
-            expense.amount = amount
-            expense.date = date
+            let expense = Expense(title: "tmp", amount: amount, date: date)
+            ctx.insert(expense)
         }
 
         let cal = Calendar.current
@@ -32,14 +29,7 @@ final class ExpensesChartViewTests: XCTestCase {
         makeExpense(amount: 15, date: cal.date(from: DateComponents(year: 2023, month: 2, day: 10))!)
 
         try ctx.save()
-
-<<<<<<< codex/update-test-setup-for-expenseschartview
-        let view = ExpensesChartView(context: ctx)
-            .environment(\.managedObjectContext, ctx)
-        let totals = view.monthlyTotalValuesForTesting()
-=======
         let totals = ExpensesChartView().monthlyTotalValuesForTesting(in: ctx)
->>>>>>> main
         XCTAssertEqual(totals, [30, 20])
     }
 }

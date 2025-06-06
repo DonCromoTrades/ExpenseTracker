@@ -1,16 +1,12 @@
-#if canImport(SwiftUI) && canImport(CoreData)
+#if canImport(SwiftUI)
 import SwiftUI
-import CoreData
+import SwiftData
 import ExpenseStore
 
 struct RecurringExpenseListView: View {
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
-    @FetchRequest(
-        entity: RecurringExpense.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \RecurringExpense.startDate, ascending: true)],
-        animation: .default
-    ) private var expenses: FetchedResults<RecurringExpense>
+    @Query(sort: \RecurringExpense.startDate) private var expenses: [RecurringExpense]
 
     @State private var showEditor = false
     @State private var editingExpense: RecurringExpense?
@@ -50,21 +46,22 @@ struct RecurringExpenseListView: View {
         }
         .sheet(isPresented: $showEditor) {
             RecurringExpenseEditView(expense: editingExpense, persistence: persistence)
-                .environment(\.managedObjectContext, context)
+                .environment(\.modelContext, context)
         }
     }
 
     private func removeExpense(at offsets: IndexSet) {
         for index in offsets {
             let ex = expenses[index]
-            try? persistence.deleteRecurringExpense(ex)
+            context.delete(ex)
         }
+        try? context.save()
     }
 }
 
 struct RecurringExpenseEditView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
     var expense: RecurringExpense?
 
@@ -116,10 +113,11 @@ struct RecurringExpenseEditView: View {
                 exp.startDate = startDate
                 exp.nextDate = startDate
                 exp.frequency = frequency.rawValue
-                try context.save()
             } else {
-                _ = try persistence.addRecurringExpense(title: title, amount: amt, startDate: startDate, frequency: frequency.rawValue)
+                let exp = RecurringExpense(title: title, amount: amt, startDate: startDate, nextDate: startDate, frequency: frequency.rawValue)
+                context.insert(exp)
             }
+            try context.save()
             dismiss()
         } catch {
             print("Save error: \(error)")
@@ -132,6 +130,6 @@ struct RecurringExpenseEditView: View {
     let ctx = controller.container.viewContext
     _ = try? controller.addRecurringExpense(title: "Gym", amount: 50, startDate: Date(), frequency: "Weekly")
     return NavigationView { RecurringExpenseListView(persistence: controller) }
-        .environment(\.managedObjectContext, ctx)
+        .environment(\.modelContext, ctx)
 }
 #endif

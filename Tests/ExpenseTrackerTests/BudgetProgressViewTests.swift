@@ -1,4 +1,4 @@
-#if canImport(SwiftUI) && canImport(CoreData)
+#if canImport(SwiftUI)
 import XCTest
 import SwiftUI
 @testable import ExpenseTracker
@@ -8,7 +8,7 @@ final class BudgetProgressViewTests: XCTestCase {
     func testViewInitialization() {
         let controller = PersistenceController(inMemory: true)
         let ctx = controller.container.viewContext
-        let view = BudgetProgressView().environment(\.managedObjectContext, ctx)
+        let view = BudgetProgressView().environment(\.modelContext, ctx)
         XCTAssertNotNil(view)
     }
 }

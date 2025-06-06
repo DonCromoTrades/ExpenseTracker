@@ -1,14 +1,12 @@
 import SwiftUI
 import ExpenseStore
+import SwiftData
 
 struct BudgetListView: View {
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
-    @FetchRequest(
-        entity: Budget.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Budget.category, ascending: true)],
-        animation: .default
-    ) private var budgets: FetchedResults<Budget>
+    @Query(sort: \Budget.category)
+    private var budgets: [Budget]
 
     @State private var showEditor = false
     @State private var editingBudget: Budget?
@@ -44,21 +42,22 @@ struct BudgetListView: View {
         }
         .sheet(isPresented: $showEditor) {
             BudgetEditView(budget: editingBudget, persistence: persistence)
-                .environment(\.managedObjectContext, context)
+                .environment(\.modelContext, context)
         }
     }
 
     private func removeBudget(at offsets: IndexSet) {
         for index in offsets {
             let budget = budgets[index]
-            try? persistence.deleteBudget(budget)
+            context.delete(budget)
         }
+        try? context.save()
     }
 }
 
 struct BudgetEditView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.managedObjectContext) private var context
+    @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
     var budget: Budget?
 
@@ -97,10 +96,11 @@ struct BudgetEditView: View {
             if let budget = budget {
                 budget.category = category
                 budget.limit = amount
-                try context.save()
             } else {
-                _ = try persistence.addBudget(category: category, limit: amount)
+                let budget = Budget(category: category, limit: amount)
+                context.insert(budget)
             }
+            try context.save()
             dismiss()
         } catch {
             print("Save error: \(error)")
@@ -113,5 +113,5 @@ struct BudgetEditView: View {
     let ctx = controller.container.viewContext
     _ = try? controller.addBudget(category: "Food", limit: 200)
     return NavigationView { BudgetListView(persistence: controller) }
-        .environment(\.managedObjectContext, ctx)
+        .environment(\.modelContext, ctx)
 }

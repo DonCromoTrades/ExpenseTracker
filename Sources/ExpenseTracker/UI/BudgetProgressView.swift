@@ -1,15 +1,11 @@
-#if canImport(SwiftUI) && canImport(CoreData)
+#if canImport(SwiftUI)
 import SwiftUI
-import CoreData
+import SwiftData
 import ExpenseStore
 
 struct BudgetProgressView: View {
-    @Environment(\.managedObjectContext) private var context
-    @FetchRequest(
-        entity: Budget.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Budget.category, ascending: true)],
-        animation: .default
-    ) private var budgets: FetchedResults<Budget>
+    @Environment(\.modelContext) private var context
+    @Query(sort: \Budget.category) private var budgets: [Budget]
 
     var body: some View {
         List {
@@ -29,12 +25,14 @@ struct BudgetProgressView: View {
     }
 
     private func spending(for budget: Budget) -> Double {
-        let req: NSFetchRequest<Expense> = Expense.fetchRequest()
         let cal = Calendar.current
         let startOfMonth = cal.date(from: cal.dateComponents([.year, .month], from: Date())) ?? Date()
         let nextMonth = cal.date(byAdding: .month, value: 1, to: startOfMonth) ?? Date()
-        req.predicate = NSPredicate(format: "category == %@ AND date >= %@ AND date < %@", budget.category, startOfMonth as NSDate, nextMonth as NSDate)
-        let expenses = (try? context.fetch(req)) ?? []
+        let predicate = #Predicate<Expense> { exp in
+            exp.category == budget.category && exp.date >= startOfMonth && exp.date < nextMonth
+        }
+        let descriptor = FetchDescriptor(predicate: predicate)
+        let expenses = (try? context.fetch(descriptor)) ?? []
         return expenses.reduce(0) { $0 + $1.amount }
     }
 }
