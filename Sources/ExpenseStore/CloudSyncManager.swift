@@ -21,6 +21,7 @@ public class CloudSyncManager {
     private let database: CKDatabaseProtocol
     private let context: ModelContext
 
+    @MainActor
     public init(container: CKContainer = .default(),
                 context: ModelContext = PersistenceController.shared.container.mainContext) {
         self.database = container.privateCloudDatabase

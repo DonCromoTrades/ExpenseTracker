@@ -4,6 +4,7 @@ import SwiftData
 import ExpenseStore
 
 final class PersistenceControllerTests: XCTestCase {
+    @MainActor
     func testCRUDOperations() throws {
         let container = try ModelContainer(for: ExpenseModel.self,
                                            RecurringExpenseModel.self,
@@ -35,6 +36,7 @@ final class PersistenceControllerTests: XCTestCase {
         XCTAssertEqual(results.count, 0)
     }
 
+    @MainActor
     func testRecurringAndBudgetHelpers() throws {
         let container = try ModelContainer(for: ExpenseModel.self,
                                            RecurringExpenseModel.self,
@@ -66,6 +68,7 @@ final class PersistenceControllerTests: XCTestCase {
         XCTAssertEqual(bFetch.count, 0)
     }
 
+    @MainActor
     func testAddRecurringExpenseCreatesObject() throws {
         let container = try ModelContainer(for: ExpenseModel.self,
                                            RecurringExpenseModel.self,
@@ -88,6 +91,7 @@ final class PersistenceControllerTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testAddBudgetCreatesObject() throws {
         let container = try ModelContainer(for: ExpenseModel.self,
                                            RecurringExpenseModel.self,
@@ -107,6 +111,7 @@ final class PersistenceControllerTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testAddExpenseCreatesObject() throws {
         let container = try ModelContainer(for: ExpenseModel.self,
                                            RecurringExpenseModel.self,

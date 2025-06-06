@@ -6,6 +6,7 @@ import ExpenseStore
 @testable import DataVisualizer
 
 final class ExpensesChartViewTests: XCTestCase {
+    @MainActor
     func testViewInitialization() {
         let controller = PersistenceController(inMemory: true)
         let ctx = controller.container.mainContext
@@ -13,6 +14,7 @@ final class ExpensesChartViewTests: XCTestCase {
         XCTAssertNotNil(view)
     }
 
+    @MainActor
     func testMonthlyTotalsSummarization() throws {
         let controller = PersistenceController(inMemory: true)
         let ctx = controller.container.mainContext
