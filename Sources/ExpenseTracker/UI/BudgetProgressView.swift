@@ -1,11 +1,11 @@
-#if canImport(SwiftUI)
+#if canImport(SwiftUI) && canImport(SwiftData)
 import SwiftUI
 import SwiftData
 import ExpenseStore
 
 struct BudgetProgressView: View {
     @Environment(\.modelContext) private var context
-    @Query(sort: \Budget.category) private var budgets: [Budget]
+    @Query(sort: [SortDescriptor(\.category)]) private var budgets: [Budget]
 
     var body: some View {
         List {
@@ -31,7 +31,7 @@ struct BudgetProgressView: View {
         let predicate = #Predicate<Expense> { exp in
             exp.category == budget.category && exp.date >= startOfMonth && exp.date < nextMonth
         }
-        let descriptor = FetchDescriptor(predicate: predicate)
+        let descriptor = FetchDescriptor<Expense>(predicate: predicate)
         let expenses = (try? context.fetch(descriptor)) ?? []
         return expenses.reduce(0) { $0 + $1.amount }
     }

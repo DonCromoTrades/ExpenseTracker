@@ -1,6 +1,6 @@
 #if canImport(CloudKit)
 import CloudKit
-import CoreData
+import SwiftData
 
 public protocol CKDatabaseProtocol {
     func save(
@@ -18,16 +18,16 @@ extension CKDatabase: CKDatabaseProtocol {}
 
 public class CloudSyncManager {
     private let database: CKDatabaseProtocol
-    private let context: NSManagedObjectContext
+    private let context: ModelContext
 
     public init(container: CKContainer = .default(),
-                context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
+                context: ModelContext = PersistenceController.shared.container.mainContext) {
         self.database = container.privateCloudDatabase
         self.context = context
     }
 
     public init(database: CKDatabaseProtocol,
-                context: NSManagedObjectContext) {
+                context: ModelContext) {
         self.database = database
         self.context = context
     }
@@ -70,14 +70,13 @@ public class CloudSyncManager {
     private func merge(records: [CKRecord]) throws {
         for record in records {
             let id = UUID(uuidString: record.recordID.recordName) ?? UUID()
-            let request: NSFetchRequest<Expense> = Expense.fetchRequest()
-            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-            if let existing = try context.fetch(request).first {
+            let descriptor = FetchDescriptor<Expense>(predicate: #Predicate { $0.id == id })
+            if let existing = try context.fetch(descriptor).first {
                 update(existing, from: record)
             } else {
-                let newExpense = Expense(context: context)
-                newExpense.id = id
+                let newExpense = Expense(id: id, title: "", amount: 0, date: Date())
                 update(newExpense, from: record)
+                context.insert(newExpense)
             }
         }
     }
@@ -115,16 +114,12 @@ public class CloudSyncManager {
                 completion(nil)
                 return
             }
-            self.context.perform {
-                do {
-                    try self.merge(records: records)
-                    if self.context.hasChanges {
-                        try self.context.save()
-                    }
-                    completion(nil)
-                } catch {
-                    completion(error)
-                }
+            do {
+                try self.merge(records: records)
+                try self.context.save()
+                completion(nil)
+            } catch {
+                completion(error)
             }
         }
     }

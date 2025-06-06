@@ -3,7 +3,7 @@
 ExpenseTracker is an app designed to help you scan receipts, organize expenses, and visualize spending over time. The code base is structured into several Swift modules to keep functionality isolated:
 
 - **ReceiptScanner** – a Vision-based utility for extracting text from receipt images.
-- **ExpenseStore** – a Core Data stack with an `Expense` model for persisting transactions.
+- **ExpenseStore** – a SwiftData stack with an `Expense` model for persisting transactions.
 - **DataVisualizer** – minimal SwiftUI views to render charts from stored data.
 
 ## Goals
@@ -21,8 +21,8 @@ need the command-line build of the package, run:
 swift build
 ```
 
-For the iOS application, open `ExpenseTracker.xcodeproj` in Xcode 14 or later,
-ensure you have the iOS 15 SDK installed, select a simulator (or a connected
+For the iOS application, open `ExpenseTracker.xcodeproj` in Xcode 15 or later,
+ensure you have the iOS 17 SDK installed, select a simulator (or a connected
 device) and press **Run**.
 
 ## Running on a Device
@@ -47,7 +47,7 @@ swift test
 
 ## Recurring Expenses and Budgets
 
-Two additional Core Data entities help automate common spend tracking tasks:
+Two additional SwiftData models help automate common spend tracking tasks:
 
 - **RecurringExpense** – stores expenses that repeat on a schedule. Each record
   tracks an `id`, `title`, `amount`, the `nextDate` the expense will occur and
@@ -60,29 +60,29 @@ Two additional Core Data entities help automate common spend tracking tasks:
 ### Fetching recurring expenses
 
 ```swift
-import CoreData
+import SwiftData
 
-let context = PersistenceController.shared.container.viewContext
-let request: NSFetchRequest<RecurringExpense> = RecurringExpense.fetchRequest()
-let recurring = try context.fetch(request)
+let container = try ModelContainer(for: RecurringExpense.self)
+let context = container.mainContext
+let recurring = try context.fetch(FetchDescriptor<RecurringExpense>())
 ```
 
 ### Computing remaining budget
 
 ```swift
-let budgetRequest: NSFetchRequest<Budget> = Budget.fetchRequest()
-let budgets = try context.fetch(budgetRequest)
+let budgets = try context.fetch(FetchDescriptor<Budget>())
 
 if let groceries = budgets.first(where: { $0.category == "Groceries" }) {
-    // Sum expenses for the category this month
-    let expReq: NSFetchRequest<Expense> = Expense.fetchRequest()
     let cal = Calendar.current
     let start = cal.date(from: cal.dateComponents([.year, .month], from: Date()))!
     let end = cal.date(byAdding: .month, value: 1, to: start)!
-    expReq.predicate = NSPredicate(
-        format: "category == %@ AND date >= %@ AND date < %@",
-        groceries.category, start as NSDate, end as NSDate)
-    let expenses = try context.fetch(expReq)
+    let expDescriptor = FetchDescriptor<Expense>(
+        predicate: #Predicate {
+            $0.category == groceries.category &&
+            $0.date >= start && $0.date < end
+        }
+    )
+    let expenses = try context.fetch(expDescriptor)
     let spent = expenses.reduce(0) { $0 + $1.amount }
 
     let remaining = groceries.limit - spent

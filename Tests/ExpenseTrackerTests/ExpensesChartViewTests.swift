@@ -1,4 +1,4 @@
-#if canImport(SwiftUI)
+#if canImport(SwiftUI) && canImport(SwiftData)
 import XCTest
 import SwiftUI
 import SwiftData
@@ -8,14 +8,14 @@ import ExpenseStore
 final class ExpensesChartViewTests: XCTestCase {
     func testViewInitialization() {
         let controller = PersistenceController(inMemory: true)
-        let ctx = controller.container.viewContext
+        let ctx = controller.container.mainContext
         let view = ExpensesChartView().environment(\.modelContext, ctx)
         XCTAssertNotNil(view)
     }
 
     func testMonthlyTotalsSummarization() throws {
         let controller = PersistenceController(inMemory: true)
-        let ctx = controller.container.viewContext
+        let ctx = controller.container.mainContext
 
         func makeExpense(amount: Double, date: Date) {
             let expense = Expense(title: "tmp", amount: amount, date: date)
@@ -29,6 +29,7 @@ final class ExpensesChartViewTests: XCTestCase {
         makeExpense(amount: 15, date: cal.date(from: DateComponents(year: 2023, month: 2, day: 10))!)
 
         try ctx.save()
+
         let totals = ExpensesChartView().monthlyTotalValuesForTesting(in: ctx)
         XCTAssertEqual(totals, [30, 20])
     }

@@ -1,11 +1,13 @@
-#if canImport(SwiftUI)
+#if canImport(SwiftUI) && canImport(SwiftData)
 import SwiftUI
 import SwiftData
 import ExpenseStore
 
 public struct ExpensesChartView: View {
     @Environment(\.modelContext) private var context
-    @Query(sort: \Expense.date) private var expenses: [Expense]
+
+    @Query(sort: [SortDescriptor(\.date)]) private var expenses: [Expense]
+  
 
     public init() {}
 
@@ -33,7 +35,8 @@ public struct ExpensesChartView: View {
     /// Returns the total expense amounts grouped by month, in ascending order.
     /// This helper is exposed for testing purposes.
     public func monthlyTotalValuesForTesting(in context: ModelContext) -> [Double] {
-        let descriptor = FetchDescriptor<Expense>(sortBy: [SortDescriptor(\Expense.date)])
+let descriptor = FetchDescriptor<Expense>(sortBy: [SortDescriptor(\.date, order: .forward)])
+
         do {
             let results = try context.fetch(descriptor)
             let calendar = Calendar.current

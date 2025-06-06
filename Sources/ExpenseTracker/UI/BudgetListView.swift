@@ -1,13 +1,15 @@
-#if canImport(SwiftUI)
+#if canImport(SwiftUI) && canImport(SwiftData)
 import SwiftUI
 import SwiftData
 import ExpenseStore
 
 struct BudgetListView: View {
     @Environment(\.modelContext) private var context
+    
     private let persistence: PersistenceController
-    @Query(sort: \Budget.category)
-    private var budgets: [Budget]
+  
+    @Query(sort: [SortDescriptor(\.category)]) private var budgets: [Budget]
+
 
     @State private var showEditor = false
     @State private var editingBudget: Budget?
@@ -111,7 +113,7 @@ struct BudgetEditView: View {
 
 #Preview {
     let controller = PersistenceController(inMemory: true)
-    let ctx = controller.container.viewContext
+    let ctx = controller.container.mainContext
     _ = try? controller.addBudget(category: "Food", limit: 200)
     return NavigationView { BudgetListView(persistence: controller) }
         .environment(\.modelContext, ctx)

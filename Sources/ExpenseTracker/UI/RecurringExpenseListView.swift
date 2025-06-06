@@ -1,4 +1,4 @@
-#if canImport(SwiftUI)
+#if canImport(SwiftUI) && canImport(SwiftData)
 import SwiftUI
 import SwiftData
 import ExpenseStore
@@ -6,7 +6,8 @@ import ExpenseStore
 struct RecurringExpenseListView: View {
     @Environment(\.modelContext) private var context
     private let persistence: PersistenceController
-    @Query(sort: \RecurringExpense.startDate) private var expenses: [RecurringExpense]
+
+    @Query(sort: [SortDescriptor(\.startDate)]) private var expenses: [RecurringExpense]
 
     @State private var showEditor = false
     @State private var editingExpense: RecurringExpense?
@@ -127,7 +128,7 @@ struct RecurringExpenseEditView: View {
 
 #Preview {
     let controller = PersistenceController(inMemory: true)
-    let ctx = controller.container.viewContext
+    let ctx = controller.container.mainContext
     _ = try? controller.addRecurringExpense(title: "Gym", amount: 50, startDate: Date(), frequency: "Weekly")
     return NavigationView { RecurringExpenseListView(persistence: controller) }
         .environment(\.modelContext, ctx)
