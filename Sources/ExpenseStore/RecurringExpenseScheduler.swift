@@ -26,6 +26,7 @@ public class RecurringExpenseScheduler {
     }
 
     /// Checks for due recurring expenses and creates `Expense` records.
+    @MainActor
     public func processDueExpenses(asOf date: Date = Date()) throws {
         let descriptor = FetchDescriptor<RecurringExpense>(predicate: #Predicate { $0.nextDate <= date })
         let items = try context.fetch(descriptor)
