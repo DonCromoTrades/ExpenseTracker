@@ -36,16 +36,14 @@ public class CloudSyncManager {
     private let database: CKDatabaseProtocol
     private let context: ModelContext
 
-    public init(container: CKContainer = .default(),
-                context: ModelContext = PersistenceController.shared.container.mainContext) {
+    public init(container: CKContainer = .default()) {
         self.database = container.privateCloudDatabase
-        self.context = context
+        self.context = PersistenceController.shared.container.mainContext
     }
 
-    public init(database: CKDatabaseProtocol,
-                context: ModelContext) {
+    public init(database: CKDatabaseProtocol) {
         self.database = database
-        self.context = context
+        self.context = PersistenceController.shared.container.mainContext
     }
 
     private func record(from expense: Expense) -> CKRecord {
