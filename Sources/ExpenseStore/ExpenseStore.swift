@@ -80,9 +80,9 @@ public struct PersistenceController {
         container = try! ModelContainer(for: schema, configurations: config)
 #if canImport(CloudKit)
         if let id = Bundle.main.object(forInfoDictionaryKey: "CloudKitContainerIdentifier") as? String {
-            cloudSync = CloudSyncManager(container: CKContainer(identifier: id), context: container.mainContext)
+            cloudSync = CloudSyncManager(container: CKContainer(identifier: id))
         } else {
-            cloudSync = CloudSyncManager(context: container.mainContext)
+            cloudSync = CloudSyncManager()
         }
         cloudSync.fetchUpdates { _ in }
 #endif

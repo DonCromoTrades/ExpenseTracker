@@ -25,8 +25,8 @@ final class CloudSyncManagerTests: XCTestCase {
 
     func testSyncSavesRecords() throws {
         let mockDB = MockDatabase()
-        let context = PersistenceController(inMemory: true).container.viewContext
-        let manager = CloudSyncManager(database: mockDB, context: context)
+        let context = PersistenceController.shared.container.mainContext
+        let manager = CloudSyncManager(database: mockDB)
 
         let expense = Expense(context: context)
         expense.id = UUID()
@@ -46,8 +46,8 @@ final class CloudSyncManagerTests: XCTestCase {
 
     func testFetchUpdatesMergesRecords() throws {
         let mockDB = MockDatabase()
-        let context = PersistenceController(inMemory: true).container.viewContext
-        let manager = CloudSyncManager(database: mockDB, context: context)
+        let context = PersistenceController.shared.container.mainContext
+        let manager = CloudSyncManager(database: mockDB)
 
         let recordID = CKRecord.ID(recordName: UUID().uuidString)
         let record = CKRecord(recordType: "Expense", recordID: recordID)
