@@ -2,6 +2,20 @@
 import CloudKit
 import SwiftData
 
+actor ErrorBox {
+    private var stored: Error?
+
+    func capture(_ error: Error?) {
+        if stored == nil {
+            stored = error
+        }
+    }
+
+    func get() -> Error? {
+        stored
+    }
+}
+
 public protocol CKDatabaseProtocol {
     func save(
         _ record: CKRecord,
@@ -87,24 +101,19 @@ public class CloudSyncManager {
     public func sync(expenses: [Expense], completion: @escaping (Error?) -> Void) {
         let records = expenses.map { record(from: $0) }
         let group = DispatchGroup()
-        actor ErrorBox {
-            var error: Error?
-        }
         let errorBox = ErrorBox()
         for record in records {
             group.enter()
             database.save(record) { _, error in
                 Task {
-                    if await errorBox.error == nil {
-                        await errorBox.error = error
-                    }
+                    await errorBox.capture(error)
                     group.leave()
                 }
             }
         }
         group.notify(queue: .main) {
             Task {
-                let err = await errorBox.error
+                let err = await errorBox.get()
                 if let err {
                     completion(err)
                 } else {
