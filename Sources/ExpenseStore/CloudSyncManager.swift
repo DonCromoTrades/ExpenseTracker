@@ -17,11 +17,11 @@ public protocol CKDatabaseProtocol {
 extension CKDatabase: CKDatabaseProtocol {}
 
 @available(iOS 17.0, macOS 14.0, *)
+@MainActor
 public class CloudSyncManager {
     private let database: CKDatabaseProtocol
     private let context: ModelContext
 
-    @MainActor
     public init(container: CKContainer = .default(),
                 context: ModelContext = PersistenceController.shared.container.mainContext) {
         self.database = container.privateCloudDatabase
@@ -87,23 +87,29 @@ public class CloudSyncManager {
     public func sync(expenses: [Expense], completion: @escaping (Error?) -> Void) {
         let records = expenses.map { record(from: $0) }
         let group = DispatchGroup()
-        var capturedError: Error?
+        actor ErrorBox {
+            var error: Error?
+        }
+        let errorBox = ErrorBox()
         for record in records {
             group.enter()
             database.save(record) { _, error in
-                if capturedError == nil {
-                    capturedError = error
+                Task {
+                    if await errorBox.error == nil {
+                        await errorBox.error = error
+                    }
+                    group.leave()
                 }
-                group.leave()
             }
         }
         group.notify(queue: .main) {
-            if let err = capturedError {
-                completion(err)
-                return
-            }
-            Task { @MainActor in
-                self.fetchUpdates(completion: completion)
+            Task {
+                let err = await errorBox.error
+                if let err {
+                    completion(err)
+                } else {
+                    self.fetchUpdates(completion: completion)
+                }
             }
         }
     }
