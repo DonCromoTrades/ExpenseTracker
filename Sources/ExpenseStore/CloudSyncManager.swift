@@ -69,6 +69,7 @@ public class CloudSyncManager {
         }
     }
 
+    @MainActor
     private func merge(records: [CKRecord]) throws {
         for record in records {
             let id = UUID(uuidString: record.recordID.recordName) ?? UUID()
@@ -101,7 +102,9 @@ public class CloudSyncManager {
                 completion(err)
                 return
             }
-            self.fetchUpdates(completion: completion)
+            Task { @MainActor in
+                self.fetchUpdates(completion: completion)
+            }
         }
     }
 
@@ -109,19 +112,25 @@ public class CloudSyncManager {
         let query = CKQuery(recordType: "Expense", predicate: NSPredicate(value: true))
         database.perform(query, inZoneWith: nil) { records, error in
             if let error = error {
-                completion(error)
+                Task { @MainActor in
+                    completion(error)
+                }
                 return
             }
             guard let records = records else {
-                completion(nil)
+                Task { @MainActor in
+                    completion(nil)
+                }
                 return
             }
-            do {
-                try self.merge(records: records)
-                try self.context.save()
-                completion(nil)
-            } catch {
-                completion(error)
+            Task { @MainActor in
+                do {
+                    try self.merge(records: records)
+                    try self.context.save()
+                    completion(nil)
+                } catch {
+                    completion(error)
+                }
             }
         }
     }
