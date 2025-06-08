@@ -6,7 +6,8 @@ import ExpenseStore
 @available(iOS 17.0, macOS 14.0, *)
 struct BudgetProgressView: View {
     @Environment(\.modelContext) private var context
-    @Query(sort: [SortDescriptor(\.category)]) private var budgets: [Budget]
+    @Query(sort: [SortDescriptor<Budget>(\.category)])
+    private var budgets: [Budget]
 
     var body: some View {
         List {
@@ -29,12 +30,20 @@ struct BudgetProgressView: View {
         let cal = Calendar.current
         let startOfMonth = cal.date(from: cal.dateComponents([.year, .month], from: Date())) ?? Date()
         let nextMonth = cal.date(byAdding: .month, value: 1, to: startOfMonth) ?? Date()
-        let predicate = #Predicate<Expense> { exp in
-            exp.category == budget.category && exp.date >= startOfMonth && exp.date < nextMonth
+
+        let category = budget.category
+
+        let predicate = #Predicate<Expense> {
+            $0.category == category &&
+            $0.date >= startOfMonth &&
+            $0.date < nextMonth
         }
+
+
         let descriptor = FetchDescriptor<Expense>(predicate: predicate)
-        let expenses = (try? context.fetch(descriptor)) ?? []
+        let expenses: [Expense] = (try? context.fetch(descriptor)) ?? []
         return expenses.reduce(0) { $0 + $1.amount }
     }
+
 }
 #endif

@@ -7,8 +7,8 @@ import ExpenseStore
 public struct ExpensesChartView: View {
     @Environment(\.modelContext) private var context
 
-    @Query(sort: [SortDescriptor(\.date)]) private var expenses: [Expense]
-  
+    @Query(sort: [SortDescriptor<Expense>(\.date)]) private var expenses: [Expense]
+
 
     public init() {}
 

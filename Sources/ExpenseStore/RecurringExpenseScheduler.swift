@@ -2,14 +2,17 @@
 import Foundation
 import SwiftData
 
-@available(iOS 17.0, macOS 14.0, *)
 @MainActor
 public class RecurringExpenseScheduler {
     private let context: ModelContext
     private let calendar = Calendar.current
 
-    public init(context: ModelContext = PersistenceController.shared.container.mainContext) {
-        self.context = context
+    public init(context: ModelContext? = nil) {
+        if let context {
+            self.context = context
+        } else {
+            self.context = PersistenceController.shared.container.mainContext
+        }
     }
 
     private func advanceDate(_ date: Date, frequency: RecurrenceFrequency) -> Date {
@@ -26,17 +29,26 @@ public class RecurringExpenseScheduler {
     }
 
     /// Checks for due recurring expenses and creates `Expense` records.
-    @MainActor
     public func processDueExpenses(asOf date: Date = Date()) throws {
-        let descriptor = FetchDescriptor<RecurringExpense>(predicate: #Predicate { $0.nextDate <= date })
+        let descriptor = FetchDescriptor<RecurringExpense>(
+            predicate: #Predicate { $0.nextDate <= date }
+        )
+
         let items = try context.fetch(descriptor)
+
         for item in items {
-            let expense = Expense(title: item.title, amount: item.amount, date: item.nextDate)
+            let expense = Expense(
+                title: item.title,
+                amount: item.amount,
+                date: item.nextDate
+            )
             context.insert(expense)
+
             if let freq = RecurrenceFrequency(rawValue: item.frequency) {
                 item.nextDate = advanceDate(item.nextDate, frequency: freq)
             }
         }
+
         try context.save()
     }
 }
